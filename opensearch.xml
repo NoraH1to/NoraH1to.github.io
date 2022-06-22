@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>NoraH1to の 乱炖锅</ShortName>
+  <Description>Search NoraH1to の 乱炖锅</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="16" height="16" type="image/x-icon">https://www.norah1to.com/img/favicon.ico</Image>
+  <Url type="text/html" method="get" template="https://www.norah1to.com/search?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://www.norah1to.com/opensearch.xml" />
+  <moz:SearchForm>https://www.norah1to.com/</moz:SearchForm>
+</OpenSearchDescription>

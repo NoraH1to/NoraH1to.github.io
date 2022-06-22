@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunknorah1to_blog=self.webpackChunknorah1to_blog||[]).push([[543],{4308:function(o){o.exports=JSON.parse('{"permalink":"/blog/tags/emo","page":1,"postsPerPage":10,"totalPages":1,"totalCount":3,"blogDescription":"Blog","blogTitle":"Blog"}')}}]);

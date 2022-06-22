@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunknorah1to_blog=self.webpackChunknorah1to_blog||[]).push([[1663],{1342:function(s){s.exports=JSON.parse('{"name":"ES6","permalink":"/docs/tags/es-6","docs":[{"id":"basic/javascript/scope/index","title":"\u4f5c\u7528\u57df","description":"\u4f5c\u7528\u57df","permalink":"/docs/basic/javascript/scope/"}],"allTagsPath":"/docs/tags"}')}}]);

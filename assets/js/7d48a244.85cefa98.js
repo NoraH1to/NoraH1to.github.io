@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunknorah1to_blog=self.webpackChunknorah1to_blog||[]).push([[5126],{9123:function(o){o.exports=JSON.parse('{"allTagsPath":"/blog/tags","name":"emo","count":3,"permalink":"/blog/tags/emo"}')}}]);
