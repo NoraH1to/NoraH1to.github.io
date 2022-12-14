@@ -1,0 +1,77 @@
+<hr>
+<h2 id="title-css-renderdate-2022-08-07-18-16-00authors-NoraH1tocategories-前端-css-css-in-js-tags-css-in-js"><a href="#title-css-renderdate-2022-08-07-18-16-00authors-NoraH1tocategories-前端-css-css-in-js-tags-css-in-js" class="headerlink" title="title: css-renderdate: 2022-08-07 18:16:00authors: NoraH1tocategories:  - [前端, css, css-in-js]tags:  - css-in-js"></a>title: css-render<br>date: 2022-08-07 18:16:00<br>authors: NoraH1to<br>categories:<br>  - [前端, css, css-in-js]<br>tags:<br>  - css-in-js</h2><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>由 <a href="https://www.naiveui.com/"><code>naive-ui</code></a> 的作者维护，并且 <code>naive-ui</code> 也使用了该库</p>
+<p>文档地址：<a href="https://css-render.vercel.app/">https://css-render.vercel.app</a></p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>它仅仅作为一个 css 生成器，有点像 <code>scss</code> 的 js 实现，在代码层面<strong>与组件没有关联性</strong></p>
+<p>作者也在文档中建议使用 <code>css-render</code> 开发组件库而不是应用</p>
+<p>并且带有一个简单的插件系统，作者维护了一个 BEM 插件，<code>naive-ui</code> 的样式大部分都通过该库配合 BEM 插件构建</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>默认导入该库并初始化后，其 <code>c</code> 方法是核心</p>
+<pre><code class="typescript">import CssRender from &#39;css-render&#39;;
+const { c } = CssRender();
+</code></pre>
+<h3 id="构建渲染对象"><a href="#构建渲染对象" class="headerlink" title="构建渲染对象"></a>构建渲染对象</h3><p><code>c</code> 方法可以传三个参数：</p>
+<ul>
+<li><p>第一个参数是选择器，支持 <code>&amp;</code> 语法选中父选择器；</p>
+</li>
+<li><p>第二个参数是该选择器的样式；</p>
+</li>
+<li><p>第三个参数是孩子样式，传递一个数组，数组项都为 <code>c</code> 方法执行的结果；第二个参数是可选的，可以在直接在第二个参数上传孩子样式数组</p>
+</li>
+</ul>
+<pre><code class="typescript">c(&#39;.cls&#39;, { color: &#39;red&#39; }, [
+  c(&#39;.child&#39;, { backgroundColor: &#39;gray&#39; }),
+  c(&#39;&amp;.blue&#39;, { color: &#39;blue&#39; }),
+]);
+</code></pre>
+<p>上面代码构建的样式会长这样</p>
+<pre><code class="css">.cls {
+  color: red;
+}
+.cls .child {
+  background-color: gray;
+}
+.cls.blue {
+  color: blue;
+}
+</code></pre>
+<h3 id="渲染"><a href="#渲染" class="headerlink" title="渲染"></a>渲染</h3><p>渲染有两种方法，第一种是生成为字符串</p>
+<pre><code class="typescript">const style = c(&#39;.cls&#39;, { color: &#39;red&#39; }, [
+  c(&#39;.child&#39;, { backgroundColor: &#39;gray&#39; }),
+  c(&#39;&amp;.blue&#39;, { color: &#39;blue&#39; }),
+]);
+style.render(); // 该方法返回 css 字符串
+</code></pre>
+<p>如果我们需要自定义参数来构建，可以在 <code>render</code> 中直接传递对象参数</p>
+<pre><code class="typescript">const style = c(&#39;.cls&#39;, ({ props }) =&gt; ({ color: props.color }), [
+  c(&#39;.child&#39;, ({ props }) =&gt; ({
+    backgroundColor: &#39;gray&#39;,
+    color: props.childColor,
+  })),
+  c(&#39;&amp;.blue&#39;, { color: &#39;blue&#39; }),
+]);
+style.render({ color: &#39;green&#39;, childColor: &#39;gray&#39; });
+</code></pre>
+<p>第二种方法是构建 <code>style</code> 标签挂载到浏览器头部</p>
+<pre><code class="typescript">const style = c(&#39;.cls&#39;, { color: &#39;red&#39; }, [
+  c(&#39;.child&#39;, { backgroundColor: &#39;gray&#39; }),
+  c(&#39;&amp;.blue&#39;, { color: &#39;blue&#39; }),
+]);
+style.mount(); // 返回值为 style 标签的 DOM 对象
+</code></pre>
+<p><img src="/2022/08/07/css/css-in-js/css-render/style_tag.png" alt="style标签"></p>
+<p>可以看到标签上自动生成了 <code>cssr-id</code>，该 id 通过 <code>@emotion/hash</code> 生成，该库可以通过样式内容生成一个唯一哈希值</p>
+<p>也可以手动控制 id</p>
+<pre><code class="typescript">style.mount({ id: &#39;233&#39; });
+</code></pre>
+<p><img src="/2022/08/07/css/css-in-js/css-render/style_tag_1.png" alt="style标签自定义id"></p>
+<p>当然也可以自定义参数，只不过需要在对象的 <code>props</code> 上传递</p>
+<pre><code class="typescript">style.mount({ props: { color: &#39;green&#39;, childColor: &#39;gray&#39; } });
+</code></pre>
+<h3 id="高级用法"><a href="#高级用法" class="headerlink" title="高级用法"></a>高级用法</h3><p>第一和第二个参数都可以传一个方法，其返回值会作为对应的参数传递，方法接收一个 <code>option</code> 对象参数，有两个属性：</p>
+<ul>
+<li><p><code>context</code>: 上下文，供插件开发者使用的玩意，不用在意</p>
+</li>
+<li><p><code>props</code>: 后续渲染样式时传递的参数</p>
+</li>
+</ul>
+<p>同时选择器还有更高级的用法，可以传递一个对象，能够定义钩子函数，在样式渲染前后进行一些操作</p>
+<p>除此之外还有 SSR 等等支持，具体看文档</p>

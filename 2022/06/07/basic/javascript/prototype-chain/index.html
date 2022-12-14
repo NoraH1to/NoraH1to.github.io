@@ -1,0 +1,360 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>原型链 | 乱炖锅</title><meta name="author" content="NoraH1to"><meta name="copyright" content="NoraH1to"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="前言最近在恶补 JS 基础，什么闭包、作用域链、词法环境、事件循环 balabala…人都补傻了… 大概这就是半路出家学前端的代价吧 QAQ。 今天先来把最近刚刚啃透的原型链知识梳理一下。   几个概念这几个概念是理解原型链的基础，非！常！重！要！ 万物皆为对象在 JS 中，除了 null、undefined 之外的所有数据类型都是对象。 没错， NaN 也是对象，NaN 本质上是 number。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="原型链">
+<meta property="og:url" content="https://www.norah1to.com/2022/06/07/basic/javascript/prototype-chain/index.html">
+<meta property="og:site_name" content="乱炖锅">
+<meta property="og:description" content="前言最近在恶补 JS 基础，什么闭包、作用域链、词法环境、事件循环 balabala…人都补傻了… 大概这就是半路出家学前端的代价吧 QAQ。 今天先来把最近刚刚啃透的原型链知识梳理一下。   几个概念这几个概念是理解原型链的基础，非！常！重！要！ 万物皆为对象在 JS 中，除了 null、undefined 之外的所有数据类型都是对象。 没错， NaN 也是对象，NaN 本质上是 number。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.norah1to.com/img/cover_post.jpeg">
+<meta property="article:published_time" content="2022-06-07T12:36:00.000Z">
+<meta property="article:modified_time" content="2022-12-14T11:16:57.488Z">
+<meta property="article:author" content="NoraH1to">
+<meta property="article:tag" content="Javascript">
+<meta property="article:tag" content="原型链">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.norah1to.com/img/cover_post.jpeg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.norah1to.com/2022/06/07/basic/javascript/prototype-chain/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: {"appId":"XO6UXN6VA1","apiKey":"9703dc8945858f7b3cb5c9ab16b2c9f0","indexName":"norah1to","hits":{"per_page":6},"languages":{"input_placeholder":"搜索文章","hits_empty":"找不到您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，用时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: NoraH1to","link":"链接: ","source":"来源: 乱炖锅","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '原型链',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-12-14 19:16:57'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/main.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">27</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/cover_post.jpeg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">乱炖锅</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">原型链</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-06-07T12:36:00.000Z" title="发表于 2022-06-07 20:36:00">2022-06-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-14T11:16:57.488Z" title="更新于 2022-12-14 19:16:57">2022-12-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%89%8D%E7%AB%AF/">前端</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%89%8D%E7%AB%AF/Javascript/">Javascript</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span><span class="post-meta-separator">|</span><span id="" data-flag-title="原型链"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="twikoo_visitors"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近在恶补 JS 基础，什么闭包、作用域链、词法环境、事件循环 balabala…人都补傻了…</p>
+<p>大概这就是半路出家学前端的代价吧 QAQ。</p>
+<p>今天先来把最近刚刚啃透的<strong>原型链</strong>知识梳理一下。</p>
+<!--truncate-->
+
+<h1 id="几个概念"><a href="#几个概念" class="headerlink" title="几个概念"></a>几个概念</h1><p>这几个概念是理解原型链的基础，<strong>非！常！重！要！</strong></p>
+<h2 id="万物皆为对象"><a href="#万物皆为对象" class="headerlink" title="万物皆为对象"></a>万物皆为对象</h2><p>在 JS 中，除了 <code>null</code>、<code>undefined</code> 之外的<strong>所有数据类型</strong>都是对象。</p>
+<p>没错， <code>NaN</code> 也是对象，<code>NaN</code> 本质上是 <code>number</code>。</p>
+<h3 id="普通对象"><a href="#普通对象" class="headerlink" title="普通对象"></a>普通对象</h3><p>就是对象（废话）。</p>
+<p>普通对象都会拥有 <code>__proto__</code> 属性。</p>
+<ul>
+<li><code>&#123;&#125;</code> 是普通对象。</li>
+<li><code>var foo = new Foo()</code> ，<code>foo</code> 是普通对象。</li>
+<li><code>&quot;abc&quot;</code> 是普通对象。</li>
+<li><code>123</code> 是普通对象。</li>
+<li><code>NaN</code> 也是普通对象。</li>
+</ul>
+<h3 id="函数对象"><a href="#函数对象" class="headerlink" title="函数对象"></a>函数对象</h3><p>就是函数。</p>
+<p>函数对象都会拥有 <code>prototype</code> 属性，函数对象同时也是普通对象，所以也拥有 <code>__proto__</code> 属性。</p>
+<ul>
+<li><code>function A() &#123;&#125;</code> 是一个函数对象。</li>
+<li><code>String</code>、<code>Number</code>、<code>Object</code>、<code>Function</code> 等都是函数对象。</li>
+</ul>
+<h3 id="普通对象是函数对象的实例"><a href="#普通对象是函数对象的实例" class="headerlink" title="普通对象是函数对象的实例"></a>普通对象是函数对象的实例</h3><p>下面这几个例子看一下，相信就能理解了</p>
+<ul>
+<li><p><code>&#123;&#125;</code> 是 <code>Object</code> 的实例，我们平时看到的 <code>var obj = &#123;&#125;</code> 其实等于 <code>var obj = new Object(&#123;&#125;)</code></p>
+</li>
+<li><p><code>foo</code> 是 <code>function Foo() &#123;&#125;</code> 的实例</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Foo</span>(<span class="params"></span>) &#123;&#125;</span><br><span class="line"><span class="keyword">var</span> foo = <span class="keyword">new</span> <span class="title class_">Foo</span>();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>&quot;abc&quot;</code> 是 <code>String</code> 的实例</p>
+</li>
+<li><p><code>123</code> 是 <code>Number</code> 的实例</p>
+</li>
+<li><p><code>NaN</code> 也是 <code>Number</code> 的实例</p>
+</li>
+</ul>
+<h3 id="prototype"><a href="#prototype" class="headerlink" title="prototype"></a>prototype</h3><p><code>prototype</code> 即是对象的原型</p>
+<h3 id="proto"><a href="#proto" class="headerlink" title="__proto__"></a>__proto__</h3><p><code>__proto__</code> 串起原型形成了原型链，可以理解 <code>__proto__</code> 指向该对象继承的父对象</p>
+<h2 id="几个准则"><a href="#几个准则" class="headerlink" title="几个准则"></a>几个准则</h2><p>总结出来的几个规律，能记住基本上<strong>吴迪</strong>！</p>
+<h3 id="准则一"><a href="#准则一" class="headerlink" title="准则一"></a>准则一</h3><p>普通对象的 <code>__proto__</code> 指向实例化它的函数对象的 <code>prototype</code>。</p>
+<p>所以：</p>
+<blockquote>
+<p><code>__proto__</code> 串起原型形成了原型链</p>
+</blockquote>
+<h4 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Foo</span>(<span class="params"></span>) &#123;&#125;</span><br><span class="line"><span class="keyword">var</span> foo = <span class="keyword">new</span> <span class="title class_">Foo</span>();</span><br><span class="line"></span><br><span class="line">foo.<span class="property">__proto__</span> === <span class="title class_">Foo</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="准则二"><a href="#准则二" class="headerlink" title="准则二"></a>准则二</h3><p><strong>函数对象</strong>的原型上的 <code>constructor</code> 指向函数对象本身。</p>
+<h4 id="例子-1"><a href="#例子-1" class="headerlink" title="例子"></a>例子</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Foo</span>(<span class="params"></span>) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="title class_">Foo</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">constructor</span> === <span class="title class_">Foo</span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="准则三"><a href="#准则三" class="headerlink" title="准则三"></a>准则三</h3><p><strong>函数对象</strong>都是 <code>Function</code> 类型的<strong>实例</strong>，包括 <code>Object</code>，也包括 <code>Function</code> 本身。</p>
+<h4 id="例子-2"><a href="#例子-2" class="headerlink" title="例子"></a>例子</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Foo</span>(<span class="params"></span>) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="title class_">Foo</span>.<span class="property">__proto__</span> === <span class="title class_">Function</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// true</span></span><br><span class="line"><span class="title class_">String</span>.<span class="property">__proto__</span> === <span class="title class_">Function</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">//true</span></span><br><span class="line"><span class="title class_">Object</span>.<span class="property">__proto__</span> === <span class="title class_">Function</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">//true</span></span><br><span class="line"><span class="title class_">Function</span>.<span class="property">__proto__</span> === <span class="title class_">Function</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="准则四"><a href="#准则四" class="headerlink" title="准则四"></a>准则四</h3><p>除了 <code>Object</code> 以外的函数对象的原型都继承于 <code>Object</code> 的原型</p>
+<p><code>Object</code> 的原型继承于 <code>null</code>，即原型链的顶端为 <code>null</code></p>
+<h4 id="例子-3"><a href="#例子-3" class="headerlink" title="例子"></a>例子</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Foo</span>(<span class="params"></span>) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="title class_">Foo</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">__proto__</span> === <span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// true</span></span><br><span class="line"><span class="title class_">String</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">__proto__</span> === <span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// true</span></span><br><span class="line"><span class="title class_">Number</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">__proto__</span> === <span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// true</span></span><br><span class="line"><span class="title class_">Boolean</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">__proto__</span> === <span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// true</span></span><br><span class="line"><span class="title class_">Function</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">__proto__</span> === <span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// true</span></span><br><span class="line"></span><br><span class="line"><span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">__proto__</span>; <span class="comment">// null</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="准则五"><a href="#准则五" class="headerlink" title="准则五"></a>准则五</h3><p>获取普通对象的属性时，若不能在普通对象本身上找到，则去<strong>原型链</strong>上获取。</p>
+<p>即先从其 <code>__proto__</code> 上获取，若还是没有，则继续去其 <code>__proto__.__proto__</code> 上获取，直到<strong>原型链顶端</strong>或<strong>找到为止</strong>。</p>
+<h4 id="例子-4"><a href="#例子-4" class="headerlink" title="例子"></a>例子</h4><p><code>foo</code> 上并未定义 <code>toString</code> 方法，但是能拿到，是因为会在原型链上找。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Foo</span>(<span class="params"></span>) &#123;&#125;</span><br><span class="line"><span class="keyword">var</span> foo = <span class="keyword">new</span> <span class="title class_">Foo</span>();</span><br><span class="line"></span><br><span class="line">foo.<span class="property">toString</span>; <span class="comment">// ƒ toString() &#123; [native code] &#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>test</code> 未定义且原型链上也找不到该属性，所以会报错；<br>若在 <code>Object</code> 的原型上加上该属性的话，即可获取到，也证明了原型链的逻辑。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">foo.<span class="property">test</span>; <span class="comment">// Uncaught ReferenceError: foo is not defined</span></span><br><span class="line"><span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">test</span> = <span class="string">&#x27;test&#x27;</span>;</span><br><span class="line">foo.<span class="property">test</span>; <span class="comment">// &quot;test&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="准则六"><a href="#准则六" class="headerlink" title="准则六"></a>准则六</h3><p>所有某一对象的实例，<strong>共享同一个对象原型</strong>，对象原型是一个 <code>Object</code> 的实例；</p>
+<p>已经创建的实例的 <code>__proto__</code> 引用不会改变；</p>
+<p>若对象原型设置为了非引用类型，则新的实例的 <code>__proto__</code> 会直接指向 <code>Object.prototype</code>。</p>
+<h4 id="例子-5"><a href="#例子-5" class="headerlink" title="例子"></a>例子</h4><p>引用相同。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">Foo</span>(<span class="params"></span>) &#123;&#125;</span><br><span class="line"><span class="title class_">Foo</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">test</span> = <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> foo1 = <span class="keyword">new</span> <span class="title class_">Foo</span>();</span><br><span class="line"><span class="keyword">var</span> foo2 = <span class="keyword">new</span> <span class="title class_">Foo</span>();</span><br><span class="line"></span><br><span class="line">foo1.<span class="property">__proto__</span> === foo2.<span class="property">__proto__</span>; <span class="comment">// true</span></span><br><span class="line">foo1.<span class="property">test</span>; <span class="comment">// &quot;1&quot;</span></span><br><span class="line">foo2.<span class="property">test</span>; <span class="comment">// &quot;1&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="title class_">Foo</span>.<span class="property"><span class="keyword">prototype</span></span>.<span class="property">test</span> = <span class="string">&#x27;2&#x27;</span>;</span><br><span class="line"></span><br><span class="line">foo1.<span class="property">test</span>; <span class="comment">// &quot;2&quot;</span></span><br><span class="line">foo2.<span class="property">test</span>; <span class="comment">// &quot;2&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>改变引用。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Foo</span>.<span class="property"><span class="keyword">prototype</span></span> = &#123; <span class="attr">newTest</span>: <span class="number">1</span> &#125;;</span><br><span class="line"><span class="keyword">var</span> foo3 = <span class="keyword">new</span> <span class="title class_">Foo</span>();</span><br><span class="line"></span><br><span class="line">foo1.<span class="property">test</span>; <span class="comment">// &quot;2&quot;</span></span><br><span class="line">foo2.<span class="property">test</span>; <span class="comment">// &quot;2&quot;</span></span><br><span class="line">foo1.<span class="property">__proto__</span> === foo2.<span class="property">__proto__</span>; <span class="comment">//true</span></span><br><span class="line">foo2.<span class="property">__proto__</span> === foo3.<span class="property">__proto__</span>; <span class="comment">//false</span></span><br><span class="line">foo3.<span class="property">test</span>; <span class="comment">// undefined</span></span><br><span class="line">foo3.<span class="property">newTest</span>; <span class="comment">// 1</span></span><br></pre></td></tr></table></figure>
+
+<p>设置原型为非引用类型。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="title class_">Foo</span>.<span class="property"><span class="keyword">prototype</span></span> = <span class="string">&#x27;test&#x27;</span>;</span><br><span class="line"><span class="keyword">var</span> foo4 = <span class="keyword">new</span> <span class="title class_">Foo</span>();</span><br><span class="line"></span><br><span class="line">foo4.<span class="property">__proto__</span> === <span class="title class_">Foo</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// false</span></span><br><span class="line">foo4.<span class="property">__proto__</span> === <span class="title class_">Object</span>.<span class="property"><span class="keyword">prototype</span></span>; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>我个人就不总结了，直接上一张非常经典的图，这张图比任何总结都来的直观。</p>
+<p>如果能利用上面的原理、准则过一遍，基本上就没问题了！</p>
+<p><img src="/2022/06/07/basic/javascript/prototype-chain/16e3fec6c1fb209e.jpg"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://www.norah1to.com">NoraH1to</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://www.norah1to.com/2022/06/07/basic/javascript/prototype-chain/">https://www.norah1to.com/2022/06/07/basic/javascript/prototype-chain/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.norah1to.com" target="_blank">乱炖锅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Javascript/">Javascript</a><a class="post-meta__tags" href="/tags/%E5%8E%9F%E5%9E%8B%E9%93%BE/">原型链</a></div><div class="post_share"><div class="social-share" data-image="/img/cover_post.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/06/10/basic/network/tcp/"><img class="prev-cover" src="/img/cover_post.jpeg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">TCP协议</div></div></a></div><div class="next-post pull-right"><a href="/2022/05/02/vue2/v-model/"><img class="next-cover" src="/img/cover_post.jpeg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">双向绑定</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/06/13/basic/javascript/comparison-operator/" title="比较运算符"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-06-13</div><div class="title">比较运算符</div></div></a></div><div><a href="/2022/06/14/basic/javascript/copy-object/" title="对象拷贝"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-06-14</div><div class="title">对象拷贝</div></div></a></div><div><a href="/2022/06/17/basic/javascript/event-loop/" title="事件循环"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-06-17</div><div class="title">事件循环</div></div></a></div><div><a href="/2022/11/23/basic/javascript/new/" title="new 关键字"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-11-23</div><div class="title">new 关键字</div></div></a></div><div><a href="/2022/06/15/basic/javascript/scope/" title="作用域"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-06-15</div><div class="title">作用域</div></div></a></div><div><a href="/2022/06/16/basic/javascript/this/" title="this 的指向"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-06-16</div><div class="title">this 的指向</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NoraH1to</div><div class="author-info__description">以我残躯化作烈火</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">27</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/11171730/"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="mailto:sterbenlixuan@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://github.com/NoraH1to" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="http://steamcommunity.com/profiles/76561198239304782/" target="_blank" title="Steam"><i class="fa-brands fa-steam"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%87%A0%E4%B8%AA%E6%A6%82%E5%BF%B5"><span class="toc-number">2.</span> <span class="toc-text">几个概念</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%87%E7%89%A9%E7%9A%86%E4%B8%BA%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.1.</span> <span class="toc-text">万物皆为对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%99%AE%E9%80%9A%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.1.1.</span> <span class="toc-text">普通对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.1.2.</span> <span class="toc-text">函数对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%99%AE%E9%80%9A%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%AE%9E%E4%BE%8B"><span class="toc-number">2.1.3.</span> <span class="toc-text">普通对象是函数对象的实例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#prototype"><span class="toc-number">2.1.4.</span> <span class="toc-text">prototype</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#proto"><span class="toc-number">2.1.5.</span> <span class="toc-text">__proto__</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%A0%E4%B8%AA%E5%87%86%E5%88%99"><span class="toc-number">2.2.</span> <span class="toc-text">几个准则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%86%E5%88%99%E4%B8%80"><span class="toc-number">2.2.1.</span> <span class="toc-text">准则一</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">例子</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%86%E5%88%99%E4%BA%8C"><span class="toc-number">2.2.2.</span> <span class="toc-text">准则二</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90-1"><span class="toc-number">2.2.2.1.</span> <span class="toc-text">例子</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%86%E5%88%99%E4%B8%89"><span class="toc-number">2.2.3.</span> <span class="toc-text">准则三</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90-2"><span class="toc-number">2.2.3.1.</span> <span class="toc-text">例子</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%86%E5%88%99%E5%9B%9B"><span class="toc-number">2.2.4.</span> <span class="toc-text">准则四</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90-3"><span class="toc-number">2.2.4.1.</span> <span class="toc-text">例子</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%86%E5%88%99%E4%BA%94"><span class="toc-number">2.2.5.</span> <span class="toc-text">准则五</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90-4"><span class="toc-number">2.2.5.1.</span> <span class="toc-text">例子</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%87%86%E5%88%99%E5%85%AD"><span class="toc-number">2.2.6.</span> <span class="toc-text">准则六</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90-5"><span class="toc-number">2.2.6.1.</span> <span class="toc-text">例子</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/11/23/basic/javascript/new/" title="new 关键字"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="new 关键字"/></a><div class="content"><a class="title" href="/2022/11/23/basic/javascript/new/" title="new 关键字">new 关键字</a><time datetime="2022-11-23T08:05:00.000Z" title="发表于 2022-11-23 16:05:00">2022-11-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/19/vue3/vuetify/source-code/use-render/" title="Vuetify v3（2）- useRender"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vuetify v3（2）- useRender"/></a><div class="content"><a class="title" href="/2022/11/19/vue3/vuetify/source-code/use-render/" title="Vuetify v3（2）- useRender">Vuetify v3（2）- useRender</a><time datetime="2022-11-19T09:05:00.000Z" title="发表于 2022-11-19 17:05:00">2022-11-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/17/vue3/vuetify/source-code/default-props/" title="Vuetify v3（1）- defineComponent"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vuetify v3（1）- defineComponent"/></a><div class="content"><a class="title" href="/2022/11/17/vue3/vuetify/source-code/default-props/" title="Vuetify v3（1）- defineComponent">Vuetify v3（1）- defineComponent</a><time datetime="2022-11-17T08:07:00.000Z" title="发表于 2022-11-17 16:07:00">2022-11-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/16/basic/css/fc/gfc/" title="栅格格式化上下文(GFC)"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="栅格格式化上下文(GFC)"/></a><div class="content"><a class="title" href="/2022/11/16/basic/css/fc/gfc/" title="栅格格式化上下文(GFC)">栅格格式化上下文(GFC)</a><time datetime="2022-11-16T13:16:00.000Z" title="发表于 2022-11-16 21:16:00">2022-11-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/16/basic/css/fc/ffc/" title="弹性格式化上下文(FFC)"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="弹性格式化上下文(FFC)"/></a><div class="content"><a class="title" href="/2022/11/16/basic/css/fc/ffc/" title="弹性格式化上下文(FFC)">弹性格式化上下文(FFC)</a><time datetime="2022-11-16T12:45:00.000Z" title="发表于 2022-11-16 20:45:00">2022-11-16</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By NoraH1to</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="algolia-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="search-wrap"><div id="algolia-search-input"></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-info"><div class="algolia-stats"></div><div class="algolia-poweredBy"></div></div></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="https://cdn.jsdelivr.net/npm/algoliasearch/dist/algoliasearch-lite.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instantsearch.js/dist/instantsearch.production.min.js"></script><script src="/js/search/algolia.js"></script><div class="js-pjax"><script>(()=>{
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'blog-1grnw2l3f5e9a363',
+      region: '',
+      onCommentLoaded: function () {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      }
+    }, null))
+  }
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'blog-1grnw2l3f5e9a363',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(function (res) {
+      countELement.innerText = res[0].count
+    }).catch(function (err) {
+      console.error(err);
+    });
+  }
+
+  const runFn = () => {
+    init()
+    
+  }
+
+  const loadTwikoo = () => {
+    if (typeof twikoo === 'object') {
+      setTimeout(runFn,0)
+      return
+    } 
+    getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(runFn)
+  }
+
+  if ('Twikoo' === 'Twikoo' || !false) {
+    if (false) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo()
+  } else {
+    window.loadOtherComment = () => {
+      loadTwikoo()
+    }
+  }
+})()</script></div><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

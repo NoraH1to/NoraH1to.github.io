@@ -1,0 +1,139 @@
+<hr>
+<h2 id="title-‘-forward’date-2022-11-10-16-53-00authors-NoraH1tocategories-前端-css-预处理器-sass-tags-sass"><a href="#title-‘-forward’date-2022-11-10-16-53-00authors-NoraH1tocategories-前端-css-预处理器-sass-tags-sass" class="headerlink" title="title: ‘@forward’date: 2022-11-10 16:53:00authors: NoraH1tocategories:  - [前端, css, 预处理器, sass]tags:  - sass"></a>title: ‘@forward’<br>date: 2022-11-10 16:53:00<br>authors: NoraH1to<br>categories:<br>  - [前端, css, 预处理器, sass]<br>tags:<br>  - sass</h2><p>配合 <code>@use</code> 使用的规则</p>
+<p>因为 <code>@use</code> 引入的模块只能在当前文件内使用，所以说如果要<strong>组合多个模块作为一个新模块</strong>暴露出去，是行不通的</p>
+<p><code>@forward</code> 正是为此而生</p>
+<p><code>@forward</code> 会加载 <code>Sass</code> 样式表，并让其<strong>混入(mixin)<strong>、</strong>函数(function)<strong>和</strong>变量</strong>在当别的样式表使用 <code>@use</code> 引入当前样式表时能够被使用。它使跨多个文件组织 <code>Sass</code> 库成为可能，用户可以加载单个入口文件。</p>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><p>基础语法为 <code>@forward &quot;&lt;url&gt;&quot;</code>。它与 <code>@use</code> 一样通过 URL 来加载模块，但它让使用该模块的用户能够使用<strong>已加模块的公共成员</strong>，就像这些<strong>已加载模块的公共成员</strong>定义在了该模块内一样。</p>
+<p>被 <code>@forward</code> 引入的模块在当前文件中是不可用的（仅仅是字面意思的转发），如果需要使用，还需要编写 <code>@use</code> 规则。不用担心，它只会被加载一次！</p>
+<p>如果同时使用 <code>@forward</code> 和 <code>@use</code> 引入一个文件，先写 <code>@forward</code> 总是没错的。这样的话，用户就可以被转发的模块；反之，如果先写 <code>@use</code>，用户就不能配置被转发的模块（会报错）。</p>
+<p>{% note default modern %}</p>
+<p>在处理模块中的 CSS 样式时，<code>@forward</code> 与 <code>@use</code> 并无差别。来自被转发模块的样式会包含在输出的 CSS 中，并且在只有 <code>@forward</code> 的却无 <code>@use</code> 模块中，被转发模块的样式可以被继承(<code>@extend</code>)。</p>
+<p>{% endnote %}</p>
+<p>{% tabs %}</p>
+<!-- tab scss -->
+
+<pre><code class="scss">// src/_list.scss
+@mixin list-reset {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+</code></pre>
+<pre><code class="scss">// bootstrap.scss
+@forward &#39;src/list&#39;;
+</code></pre>
+<pre><code class="scss">// styles.scss
+@use &#39;bootstrap&#39;;
+
+li {
+  @include bootstrap.list-reset;
+}
+</code></pre>
+<!-- endtab -->
+
+<!-- tab css -->
+
+<pre><code class="css">li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+</code></pre>
+<!-- endtab -->
+<p>{% endtabs %}</p>
+<h2 id="添加前缀"><a href="#添加前缀" class="headerlink" title="添加前缀"></a>添加前缀</h2><p>在模块中的成员，因为有了命名空间这一特性，通常名称都非常简单易懂。但是这些名称在其模块外部可能并无意义，所以 <code>@forward</code> 能够在转发的模块前加上额外的前缀。</p>
+<p>格式为 <code>@forward &quot;&lt;url&gt;&quot; as &lt;prefix&gt;-*</code>，它会在每个混入(mixin)、函数(function)和变量的名称前加上前缀。例如在某个模块中有一个成员叫 <code>reset</code>，它被转发后 <code>as list-*</code>，那么在外部需通过 <code>list-reset</code> 来使用。</p>
+<p>{% tabs %}</p>
+<!-- tab scss -->
+
+<pre><code class="scss">// src/_list.scss
+@mixin reset {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+</code></pre>
+<pre><code class="scss">// bootstrap.scss
+@forward &#39;src/list&#39; as list-*;
+</code></pre>
+<pre><code class="scss">// styles.scss
+@use &#39;bootstrap&#39;;
+
+li {
+  @include bootstrap.list-reset;
+}
+</code></pre>
+<!-- endtab -->
+
+<!-- tab css -->
+
+<pre><code class="css">li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+</code></pre>
+<!-- endtab -->
+<p>{% endtabs %}</p>
+<h2 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h2><p>有时候你不希望转发模块中所有成员。你希望有些成员变量是私有的，只在你的包内才能使用；又或者你希望用户用不同的方法加载某些成员。你可以通过 <code>@forward &quot;&lt;url&gt;&quot; hide &lt;members...&gt;</code> 或者 <code>@forward &quot;&lt;url&gt;&quot; show &lt;members...&gt;</code> 来精准控制哪些成员能够转发。</p>
+<p><code>hide</code> 隐藏意味着不应该转发列表中的成员，其余成员都应正常转发。<code>show</code> 意味着只转发列表中指定的成员。在列表中可以列出混入(mixin)、函数(function)和变量(要带上<code>$</code>)。</p>
+<pre><code class="scss">// src/_list.scss
+$horizontal-list-gap: 2em;
+
+@mixin list-reset {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@mixin list-horizontal {
+  @include list-reset;
+
+  li {
+    display: inline-block;
+    margin: {
+      left: -2px;
+      right: $horizontal-list-gap;
+    }
+  }
+}
+</code></pre>
+<pre><code class="scss">// bootstrap.scss
+@forward &#39;src/list&#39; hide list-reset, $horizontal-list-gap;
+</code></pre>
+<h2 id="配置模块"><a href="#配置模块" class="headerlink" title="配置模块"></a>配置模块</h2><p>与 <strong><code>@use</code> 的配置方法</strong>几乎一致，唯一区别是 <code>@forward</code> 配置中的值可以使用 flag <code>!default</code>。这样在允许模块修改上游值的同时，下游也能覆盖该默认值。</p>
+<p>{% tabs %}</p>
+<!-- tab scss -->
+
+<pre><code class="scss">// _library.scss
+$black: #000 !default;
+$border-radius: 0.25rem !default;
+$box-shadow: 0 0.5rem 1rem rgba($black, 0.15) !default;
+
+code {
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+}
+</code></pre>
+<pre><code class="scss">// _opinionated.scss
+@forward &#39;library&#39; with (
+  $black: #222 !default, // 覆盖了 library 的值
+  $border-radius: 0.1rem !default
+);
+</code></pre>
+<pre><code class="scss">// style.scss
+@use &#39;opinionated&#39; with (
+  $black: #333 // 覆盖了 opinionated 的值
+);
+</code></pre>
+<!-- endtab -->
+
+<!-- tab css -->
+
+<pre><code class="css">code {
+  border-radius: 0.1rem;
+  box-shadow: 0 0.5rem 1rem rgba(51, 51, 51, 0.15);
+}
+</code></pre>
+<!-- endtab -->
+<p>{% endtabs %}</p>

@@ -1,0 +1,15 @@
+<hr>
+<h2 id="title-哈希表date-2022-06-30-13-41-00authors-NoraH1tocategories-数据结构-tags-数据结构-哈希表"><a href="#title-哈希表date-2022-06-30-13-41-00authors-NoraH1tocategories-数据结构-tags-数据结构-哈希表" class="headerlink" title="title: 哈希表date: 2022-06-30 13:41:00authors: NoraH1tocategories:  - [数据结构]tags:  - 数据结构  - 哈希表"></a>title: 哈希表<br>date: 2022-06-30 13:41:00<br>authors: NoraH1to<br>categories:<br>  - [数据结构]<br>tags:<br>  - 数据结构<br>  - 哈希表</h2><h2 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h2><p>哈希的基本原理是将给定的键值转换为偏移地址来检索记录</p>
+<p>键转换为地址是通过一种关系（公式）来完成的，这就是哈希（散列）函数</p>
+<p><img src="/2022/06/30/basic/data-structure/hash-table/hash_table.webp" alt="哈希表"></p>
+<h2 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h2><p>虽然哈希表是一种有效的搜索技术，但是它还有些缺点</p>
+<p>两个不同的关键字，由于哈希函数值相同，因而被映射到同一表位置上。该现象称为冲突</p>
+<p>发生冲突的两个关键字称为该哈希函数的<strong>同义词</strong></p>
+<p>如何设计哈希函数以及如何避免冲突就是哈希表的常见问题，好的哈希函数的选择有两条标准：</p>
+<ol>
+<li><p>简单并且能够快速计算</p>
+</li>
+<li><p>能够在址空间中获取键的均匀分布</p>
+</li>
+</ol>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>应用到哈希表的经典题目：<a href="https://leetcode.cn/problems/two-sum/">两数之和</a></p>

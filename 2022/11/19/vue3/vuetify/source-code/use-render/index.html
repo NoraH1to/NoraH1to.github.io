@@ -1,0 +1,341 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Vuetify v3（2）- useRender | 乱炖锅</title><meta name="author" content="NoraH1to"><meta name="copyright" content="NoraH1to"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="如果你需要使用 setup + jsx + 暴露组件内部属性 一般来说会在 render 函数里编写 jsx 代码并返回，在 setup 中返回需要用到的属性 下面例子中的 child.tsx 为了满足上面需求，setup 暴露(返回)了所有方法   如果我们需要将 child.tsx 中 reset,init 方法设为私有呢？ 好像行不通，渲染函数只能拿到 setup 中返回的内容，此时会出现一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vuetify v3（2）- useRender">
+<meta property="og:url" content="https://www.norah1to.com/2022/11/19/vue3/vuetify/source-code/use-render/index.html">
+<meta property="og:site_name" content="乱炖锅">
+<meta property="og:description" content="如果你需要使用 setup + jsx + 暴露组件内部属性 一般来说会在 render 函数里编写 jsx 代码并返回，在 setup 中返回需要用到的属性 下面例子中的 child.tsx 为了满足上面需求，setup 暴露(返回)了所有方法   如果我们需要将 child.tsx 中 reset,init 方法设为私有呢？ 好像行不通，渲染函数只能拿到 setup 中返回的内容，此时会出现一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.norah1to.com/img/cover_post.jpeg">
+<meta property="article:published_time" content="2022-11-19T09:05:00.000Z">
+<meta property="article:modified_time" content="2022-12-14T10:56:45.401Z">
+<meta property="article:author" content="NoraH1to">
+<meta property="article:tag" content="Vue3">
+<meta property="article:tag" content="vuetify">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.norah1to.com/img/cover_post.jpeg"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://www.norah1to.com/2022/11/19/vue3/vuetify/source-code/use-render/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: {"appId":"XO6UXN6VA1","apiKey":"9703dc8945858f7b3cb5c9ab16b2c9f0","indexName":"norah1to","hits":{"per_page":6},"languages":{"input_placeholder":"搜索文章","hits_empty":"找不到您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，用时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: NoraH1to","link":"链接: ","source":"来源: 乱炖锅","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Vuetify v3（2）- useRender',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-12-14 18:56:45'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/main.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">27</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/cover_post.jpeg')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">乱炖锅</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Vuetify v3（2）- useRender</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-11-19T09:05:00.000Z" title="发表于 2022-11-19 17:05:00">2022-11-19</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-12-14T10:56:45.401Z" title="更新于 2022-12-14 18:56:45">2022-12-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%89%8D%E7%AB%AF/">前端</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%89%8D%E7%AB%AF/Vue3/">Vue3</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%89%8D%E7%AB%AF/vuetify/">vuetify</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%89%8D%E7%AB%AF/Vue3/tips/">tips</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%89%8D%E7%AB%AF/vuetify/%E6%BA%90%E7%A0%81/">源码</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span id="" data-flag-title="Vuetify v3（2）- useRender"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="twikoo_visitors"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>如果你需要使用 <code>setup</code> + <code>jsx</code> + <code>暴露组件内部属性</code></p>
+<p>一般来说会在 <code>render</code> 函数里编写 <code>jsx</code> 代码并返回，在 <code>setup</code> 中返回需要用到的属性</p>
+<p>下面例子中的 <code>child.tsx</code> 为了满足上面需求，<code>setup</code> 暴露(返回)了所有方法</p>
+<iframe src="https://codesandbox.io/embed/blog-vuetify-use-render-1-d7bmiu?fontsize=14&hidenavigation=1&module=%2Fsrc%2FApp.tsx&theme=dark"
+     width="100%"
+     height="500px"
+     title="blog-vuetify-use-render-1"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+     sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   ></iframe>
+
+<p>如果我们需要将 <code>child.tsx</code> 中 <code>reset</code>,<code>init</code> 方法设为私有呢？</p>
+<p>好像行不通，渲染函数只能拿到 <code>setup</code> 中返回的内容，此时会出现一个问题：</p>
+<ul>
+<li>渲染函数需要的变量均需要在 <code>setup</code> 中返回，导致<strong>无法控制组件暴露给外部的变量</strong></li>
+</ul>
+<p>你可能会想到 <code>setup</code> 中返回 <code>jsx</code> 渲染函数，并使用 <a target="_blank" rel="noopener" href="https://cn.vuejs.org/api/composition-api-setup.html#usage-with-render-functions"><code>expose</code></a> 暴露需要暴露的东西</p>
+<p>但是这个方法有一个<a target="_blank" rel="noopener" href="https://github.com/vuetifyjs/vuetify/pull/13214">问题</a>，使用 <code>expose</code> 后组件实例中以 <code>$</code> 开头的成员会被隐藏，导致很多高级的组件用法无法使用</p>
+<p>例如如下代码：</p>
+<figure class="highlight tsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// test.tsx</span></span><br><span class="line"><span class="keyword">import</span> &#123; ref &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> &#123;</span><br><span class="line">  <span class="title function_">setup</span>(<span class="params">props, &#123; expose &#125;</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> testData = <span class="title function_">ref</span>(<span class="number">233</span>);</span><br><span class="line">    <span class="title function_">expose</span>(&#123;</span><br><span class="line">      testData,</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> <span class="function">() =&gt;</span> <span class="language-xml"><span class="tag">&lt;<span class="name">div</span>&gt;</span>&#123;testData&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span>;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>外部通过 <code>&lt;Test ref=&#123;testRef&#125;&gt;&lt;/Test&gt;</code> 拿到组件实例 <code>testRef</code>，其内容如下</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> testRef = &#123; <span class="attr">testData</span>: <span class="number">233</span> &#125;; <span class="comment">// 组件上的 $el, $attrs 等等都拿不到了</span></span><br></pre></td></tr></table></figure>
+
+<p>那么有无两全其美的方法呢？</p>
+<p><code>useRender</code> 会给出答案</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>调试 <code>vue</code> 源码亿下，找到 <code>setup</code> 的实现，跟踪到 <code>handleSetupResult</code> 方法，发现其逻辑如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// handleSetupResult</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果 setup 执行结果是函数，则将其作为当前 vm 实例的渲染函数</span></span><br><span class="line"><span class="keyword">if</span> (<span class="title function_">isFunction</span>(setupResult)) &#123;</span><br><span class="line">  instance.<span class="property">render</span> = setupResult;</span><br><span class="line">  <span class="comment">// 如果是对象，则解包后放到实例的 setupState 中存好</span></span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="title function_">isObject</span>(setupResult)) &#123;</span><br><span class="line">  instance.<span class="property">setupState</span> = <span class="title function_">proxyRefs</span>(setupResult);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后传递 vm 实例到方法 <code>finishComponentSetup</code> 中进行处理</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// finishComponentSetup</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 先拿到组件对象</span></span><br><span class="line"><span class="comment">// PS: instance.type 上放的是组件对象，感兴趣可以自己翻源码</span></span><br><span class="line"><span class="keyword">const</span> <span class="title class_">Component</span> = instance.<span class="property">type</span>;</span><br><span class="line"><span class="comment">// 如果当前 vm 实例上没有 render 方法</span></span><br><span class="line"><span class="keyword">if</span> (!instance.<span class="property">render</span>) &#123;</span><br><span class="line">  <span class="comment">// 如果组件对象中没有渲染函数</span></span><br><span class="line">  <span class="keyword">if</span> (!<span class="title class_">Component</span>.<span class="property">render</span>) &#123;</span><br><span class="line">    <span class="comment">// 如果组件实例有模板，则将模板编译为渲染函数，塞给组件对象</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="title class_">Component</span>.<span class="property">template</span>) <span class="title class_">Component</span>.<span class="property">render</span> = <span class="title function_">compile</span>(<span class="title class_">Component</span>.<span class="property">template</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 将渲染函数塞给 vm 实例</span></span><br><span class="line"><span class="comment">// PS: NOOP 是一个空函数</span></span><br><span class="line">instance.<span class="property">render</span> = <span class="title class_">Component</span>.<span class="property">render</span> || <span class="variable constant_">NOOP</span>;</span><br></pre></td></tr></table></figure>
+
+<p>最后会在 <code>renderComponentRoot</code> 方法中调用 <code>instance.render</code> 渲染组件</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// renderComponentRoot</span></span><br><span class="line"></span><br><span class="line">instance.<span class="property">render</span>!.<span class="title function_">call</span>(...);</span><br></pre></td></tr></table></figure>
+
+<p>简单来说就是：</p>
+<ul>
+<li><p><code>vm</code> 实例上有 <code>render</code> 就拿来用</p>
+</li>
+<li><p>没有就找组件上的 <code>render</code>，组件上没有 <code>render</code> 就拿组件模板编译成 <code>render</code></p>
+</li>
+<li><p>都没有那就渲染失败报错呗</p>
+</li>
+</ul>
+<p>到这里思路应该就很清晰了</p>
+<p>如果我们<strong>在 <code>setup</code> 调用的过程中构建 <code>render</code> 并塞给当前 <code>vm</code> 实例</strong>，就可以实现在<strong>只暴露部分公开成员的同时</strong>，<strong>渲染函数能通过闭包拿到所有私有成员</strong></p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>简单暴力，但有效</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; getCurrentInstance &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">type</span> &#123; <span class="title class_">VNode</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">useRender</span>(<span class="params">render: () =&gt; VNode</span>): <span class="built_in">void</span> &#123;</span><br><span class="line">  <span class="comment">// 直接获得当前 vm 实例并给 render 赋值</span></span><br><span class="line">  <span class="keyword">const</span> vm = <span class="title function_">getCurrentInstance</span>() <span class="keyword">as</span> <span class="built_in">any</span>;</span><br><span class="line">  vm.<span class="property">render</span> = render;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从类型提示可以发现 <code>render</code> 并不是公开的，所以说该方法偏 Hook，说不准往后一次主版本号更新就寄了</p>
+<p>不过既然 <code>vuetify</code> 这种知名项目都在使用该方法，就不用太担心了</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>基于上面提到的 <code>child.tsx</code> 组件，为了方便对比源码我先贴下来</p>
+<figure class="highlight tsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; defineComponent, ref &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="title function_">defineComponent</span>(&#123;</span><br><span class="line">  <span class="title function_">setup</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> title = <span class="title function_">ref</span>(<span class="string">&#x27;title&#x27;</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="title function_">reset</span> = (<span class="params"></span>) =&gt; (title.<span class="property">value</span> = <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="title function_">init</span> = (<span class="params"></span>) =&gt; (title.<span class="property">value</span> = <span class="string">&#x27;title&#x27;</span>);</span><br><span class="line">    <span class="comment">// 返回了所有成员</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      title,</span><br><span class="line">      reset,</span><br><span class="line">      init,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="title function_">render</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&#123;&#123;</span> <span class="attr">border:</span> &#x27;<span class="attr">1px</span> <span class="attr">solid</span> <span class="attr">black</span>&#x27;, <span class="attr">padding:</span> &#x27;<span class="attr">10px</span>&#x27; &#125;&#125;&gt;</span></span></span><br><span class="line"><span class="language-xml">        I am child.</span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;this.title&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;this.reset&#125;</span>&gt;</span>reset<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;this.init&#125;</span>&gt;</span>init<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">    );</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>我们将其改造成只暴露 <code>title</code> 成员</p>
+<figure class="highlight tsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; defineComponent, ref &#125; <span class="keyword">from</span> <span class="string">&#x27;vue&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="title function_">defineComponent</span>(&#123;</span><br><span class="line">  <span class="title function_">setup</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> title = <span class="title function_">ref</span>(<span class="string">&#x27;title&#x27;</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="title function_">reset</span> = (<span class="params"></span>) =&gt; (title.<span class="property">value</span> = <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">    <span class="keyword">const</span> <span class="title function_">init</span> = (<span class="params"></span>) =&gt; (title.<span class="property">value</span> = <span class="string">&#x27;title&#x27;</span>);</span><br><span class="line">    <span class="comment">// 渲染函数通过闭包能拿到所有成员</span></span><br><span class="line">    <span class="title function_">useRender</span>(<span class="function">() =&gt;</span> (</span><br><span class="line">      <span class="language-xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">&#123;&#123;</span> <span class="attr">border:</span> &#x27;<span class="attr">1px</span> <span class="attr">solid</span> <span class="attr">black</span>&#x27;, <span class="attr">padding:</span> &#x27;<span class="attr">10px</span>&#x27; &#125;&#125;&gt;</span></span></span><br><span class="line"><span class="language-xml">        I am child.</span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">h1</span>&gt;</span>&#123;this.title&#125;<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;this.reset&#125;</span>&gt;</span>reset<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">        <span class="tag">&lt;<span class="name">button</span> <span class="attr">onClick</span>=<span class="string">&#123;this.init&#125;</span>&gt;</span>init<span class="tag">&lt;/<span class="name">button</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">      <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">    ));</span><br><span class="line">    <span class="comment">// 只返回了 title</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      title,</span><br><span class="line">    &#125;;</span><br><span class="line">  &#125;,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>此时父组件拿到的 <code>Child</code> 实例如下</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> childRef = &#123;</span><br><span class="line">  title, <span class="comment">// 只有 title 了捏</span></span><br><span class="line">  $, <span class="comment">// 其它组件实例成员也拿得到了捏</span></span><br><span class="line">  $attrs,</span><br><span class="line">  $el,</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完美</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://www.norah1to.com">NoraH1to</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://www.norah1to.com/2022/11/19/vue3/vuetify/source-code/use-render/">https://www.norah1to.com/2022/11/19/vue3/vuetify/source-code/use-render/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.norah1to.com" target="_blank">乱炖锅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Vue3/">Vue3</a><a class="post-meta__tags" href="/tags/vuetify/">vuetify</a></div><div class="post_share"><div class="social-share" data-image="/img/cover_post.jpeg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/11/23/basic/javascript/new/"><img class="prev-cover" src="/img/cover_post.jpeg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">new 关键字</div></div></a></div><div class="next-post pull-right"><a href="/2022/11/17/vue3/vuetify/source-code/default-props/"><img class="next-cover" src="/img/cover_post.jpeg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Vuetify v3（1）- defineComponent</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2022/11/17/vue3/vuetify/source-code/default-props/" title="Vuetify v3（1）- defineComponent"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-11-17</div><div class="title">Vuetify v3（1）- defineComponent</div></div></a></div><div><a href="/2022/07/03/vue3/source-code/basic/" title="Vue3 源码阅读（1）- 前置知识"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-07-03</div><div class="title">Vue3 源码阅读（1）- 前置知识</div></div></a></div><div><a href="/2022/07/25/vue3/source-code/computed/" title="Vue3 源码阅读（6）- computed"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-07-25</div><div class="title">Vue3 源码阅读（6）- computed</div></div></a></div><div><a href="/2022/07/18/vue3/source-code/effect/" title="Vue3 源码阅读（4）- effect"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-07-18</div><div class="title">Vue3 源码阅读（4）- effect</div></div></a></div><div><a href="/2022/07/04/vue3/source-code/reactive/" title="Vue3 源码阅读（2）- reactive"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-07-04</div><div class="title">Vue3 源码阅读（2）- reactive</div></div></a></div><div><a href="/2022/07/04/vue3/source-code/proxy-handlers/" title="Vue3 源码阅读（3）- ProxyHandlers"><img class="cover" src="/img/cover_post.jpeg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-07-04</div><div class="title">Vue3 源码阅读（3）- ProxyHandlers</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NoraH1to</div><div class="author-info__description">以我残躯化作烈火</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">65</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">27</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/11171730/"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="mailto:sterbenlixuan@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://github.com/NoraH1to" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="http://steamcommunity.com/profiles/76561198239304782/" target="_blank" title="Steam"><i class="fa-brands fa-steam"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">1.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-number">3.</span> <span class="toc-text">使用</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/11/23/basic/javascript/new/" title="new 关键字"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="new 关键字"/></a><div class="content"><a class="title" href="/2022/11/23/basic/javascript/new/" title="new 关键字">new 关键字</a><time datetime="2022-11-23T08:05:00.000Z" title="发表于 2022-11-23 16:05:00">2022-11-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/19/vue3/vuetify/source-code/use-render/" title="Vuetify v3（2）- useRender"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vuetify v3（2）- useRender"/></a><div class="content"><a class="title" href="/2022/11/19/vue3/vuetify/source-code/use-render/" title="Vuetify v3（2）- useRender">Vuetify v3（2）- useRender</a><time datetime="2022-11-19T09:05:00.000Z" title="发表于 2022-11-19 17:05:00">2022-11-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/17/vue3/vuetify/source-code/default-props/" title="Vuetify v3（1）- defineComponent"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vuetify v3（1）- defineComponent"/></a><div class="content"><a class="title" href="/2022/11/17/vue3/vuetify/source-code/default-props/" title="Vuetify v3（1）- defineComponent">Vuetify v3（1）- defineComponent</a><time datetime="2022-11-17T08:07:00.000Z" title="发表于 2022-11-17 16:07:00">2022-11-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/16/basic/css/fc/gfc/" title="栅格格式化上下文(GFC)"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="栅格格式化上下文(GFC)"/></a><div class="content"><a class="title" href="/2022/11/16/basic/css/fc/gfc/" title="栅格格式化上下文(GFC)">栅格格式化上下文(GFC)</a><time datetime="2022-11-16T13:16:00.000Z" title="发表于 2022-11-16 21:16:00">2022-11-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/16/basic/css/fc/ffc/" title="弹性格式化上下文(FFC)"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="弹性格式化上下文(FFC)"/></a><div class="content"><a class="title" href="/2022/11/16/basic/css/fc/ffc/" title="弹性格式化上下文(FFC)">弹性格式化上下文(FFC)</a><time datetime="2022-11-16T12:45:00.000Z" title="发表于 2022-11-16 20:45:00">2022-11-16</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By NoraH1to</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="algolia-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="search-wrap"><div id="algolia-search-input"></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-info"><div class="algolia-stats"></div><div class="algolia-poweredBy"></div></div></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="https://cdn.jsdelivr.net/npm/algoliasearch/dist/algoliasearch-lite.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instantsearch.js/dist/instantsearch.production.min.js"></script><script src="/js/search/algolia.js"></script><div class="js-pjax"><script>(()=>{
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'blog-1grnw2l3f5e9a363',
+      region: '',
+      onCommentLoaded: function () {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      }
+    }, null))
+  }
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'blog-1grnw2l3f5e9a363',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(function (res) {
+      countELement.innerText = res[0].count
+    }).catch(function (err) {
+      console.error(err);
+    });
+  }
+
+  const runFn = () => {
+    init()
+    
+  }
+
+  const loadTwikoo = () => {
+    if (typeof twikoo === 'object') {
+      setTimeout(runFn,0)
+      return
+    } 
+    getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(runFn)
+  }
+
+  if ('Twikoo' === 'Twikoo' || !false) {
+    if (false) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo()
+  } else {
+    window.loadOtherComment = () => {
+      loadTwikoo()
+    }
+  }
+})()</script></div><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

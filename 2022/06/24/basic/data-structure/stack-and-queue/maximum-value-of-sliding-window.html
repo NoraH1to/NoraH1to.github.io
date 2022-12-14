@@ -1,0 +1,48 @@
+<hr>
+<h2 id="title-滑动窗口的最大值date-2022-06-25-14-53-00authors-NoraH1tocategories-数据结构-tags-数据结构-队列"><a href="#title-滑动窗口的最大值date-2022-06-25-14-53-00authors-NoraH1tocategories-数据结构-tags-数据结构-队列" class="headerlink" title="title: 滑动窗口的最大值date: 2022-06-25 14:53:00authors: NoraH1tocategories:  - [数据结构]tags:  - 数据结构  - 队列"></a>title: 滑动窗口的最大值<br>date: 2022-06-25 14:53:00<br>authors: NoraH1to<br>categories:<br>  - [数据结构]<br>tags:<br>  - 数据结构<br>  - 队列</h2><h2 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h2><p>给定一个数组 <code>nums</code>，有一个大小为 <code>k</code> 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口 <code>k</code> 内的数字。滑动窗口每次只向右移动一位。返回滑动窗口最大值</p>
+<pre><code class="javascript">输入: nums = [1,3,-1,-3,5,3,6,7], 和 k = 3
+输出: [3,3,5,5,6,7]
+解释:
+  滑动窗口的位置                最大值
+---------------               -----
+[1  3  -1] -3  5  3  6  7       3
+ 1 [3  -1  -3] 5  3  6  7       3
+ 1  3 [-1  -3  5] 3  6  7       5
+ 1  3  -1 [-3  5  3] 6  7       5
+ 1  3  -1  -3 [5  3  6] 7       6
+ 1  3  -1  -3  5 [3  6  7]      7
+</code></pre>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>使用一个双端队列（队列两面都可进出），用于存储处于窗口中的值的<strong>下标</strong>，保证窗口头部元素永远是窗口最大值</p>
+<ol>
+<li><code>当前进入的元素下标 - 窗口头部元素的下标 &gt;= k</code> 队列头部元素移出队列（队列头部元素已经不在窗口内了）</li>
+<li>如果当前数字大于队列尾，则删除队列尾，直到当前数字小于等于队列尾，或者队列空（保证队列左侧永远是最大的值）</li>
+<li>队列元素入队</li>
+<li>第 <code>k</code> 次遍历后开始向结果中添加最大值</li>
+<li>重复 <code>1</code>,<code>2</code>,<code>3</code>,<code>4</code> 步</li>
+</ol>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><pre><code class="javascript">function maxSlidingWindow(nums, k) {
+  // window 即是窗口也是双端队列
+  const window = [];
+  const result = [];
+  for (let i = 0; i &lt; nums.length; i++) {
+    // 如果最左侧的元素在窗口外，弹出队列
+    // 这里保证了窗口宽度不大于 k
+    if (i - window[0] &gt;= k) {
+      window.shift();
+    }
+    let windowEndIndex = window.length - 1;
+    // 如果窗口最右侧的元素小于等于要滑入窗口的元素，弹出最右侧元素
+    // 保证了最左侧元素永远是是窗口内的最大值，即从左到右从大到小排序
+    while (windowEndIndex &gt;= 0 &amp;&amp; nums[window[windowEndIndex]] &lt;= nums[i]) {
+      windowEndIndex--;
+      window.pop();
+    }
+    window.push(i);
+    // 因为是求窗口内最大值，所以要等窗口完全进入数组才开始计算结果
+    if (i &gt;= k - 1) {
+      result.push(nums[window[0]]);
+    }
+  }
+  return result;
+}
+</code></pre>

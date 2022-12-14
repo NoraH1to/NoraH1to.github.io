@@ -1,0 +1,24 @@
+/* 卡片背景透明度 */
+:root {
+  --card-bg: hsla(0, 0%, 100%, 0.9);
+}
+:root[data-theme='dark'] {
+  --card-bg: rgba(18, 18, 18, 0.9);
+}
+
+/* 标题区域不可选中 */
+#site-info,
+#nav {
+  user-select: none;
+}
+
+/* 网站标题文本阴影 */
+#site-info {
+  text-shadow: 0.2rem 0.2rem 0.4rem rgb(0 0 0 / 70%);
+}
+
+/* 页脚毛玻璃滤镜 */
+#footer {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+}
