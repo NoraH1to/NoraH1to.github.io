@@ -1,17 +1,35 @@
 <hr>
-<h2 id="title-二叉树date-2022-06-21-14-26-00authors-NoraH1tocategories-数据结构-tags-二叉树-数据结构"><a href="#title-二叉树date-2022-06-21-14-26-00authors-NoraH1tocategories-数据结构-tags-二叉树-数据结构" class="headerlink" title="title: 二叉树date: 2022-06-21 14:26:00authors: NoraH1tocategories:  - [数据结构]tags:  - 二叉树  - 数据结构"></a>title: 二叉树<br>date: 2022-06-21 14:26:00<br>authors: NoraH1to<br>categories:<br>  - [数据结构]<br>tags:<br>  - 二叉树<br>  - 数据结构</h2><h2 id="简述"><a href="#简述" class="headerlink" title="简述"></a>简述</h2><p>二叉树是一种典型的树树状结构。如它名字所描述的那样，二叉树是每个节点最多有两个子树的树结构，通常子树被称作<code>左子树</code>和<code>右子树</code></p>
+<p>title: 二叉树<br>
+date: 2022-06-21 14:26:00<br>
+authors: NoraH1to<br>
+categories:</p>
 <ul>
-<li><p>根的直接子节点数称为该树的度，二叉树的度数为 <code>0 ~ 2</code></p>
+<li>[数据结构]<br>
+tags:</li>
+<li>二叉树</li>
+<li>数据结构</li>
+</ul>
+<hr>
+<h2 id="简述">简述</h2>
+<p>二叉树是一种典型的树树状结构。如它名字所描述的那样，二叉树是每个节点最多有两个子树的树结构，通常子树被称作<code>左子树</code>和<code>右子树</code></p>
+<ul>
+<li>
+<p>根的直接子节点数称为该树的度，二叉树的度数为 <code>0 ~ 2</code></p>
 </li>
-<li><p>度数为 <code>0</code> 的节点，称作<strong>叶节点</strong></p>
+<li>
+<p>度数为 <code>0</code> 的节点，称作<strong>叶节点</strong></p>
 </li>
 </ul>
-<h2 id="二叉树公式"><a href="#二叉树公式" class="headerlink" title="二叉树公式"></a>二叉树公式</h2><p>层数、索引号从 <code>0</code> 开始计算</p>
+<h2 id="二叉树公式">二叉树公式</h2>
+<p>层数、索引号从 <code>0</code> 开始计算</p>
 <ul>
-<li><p>第 <code>n</code> 层的节点数最多为 $2^{n}$ 个节点</p>
+<li>
+<p>第 <code>n</code> 层的节点数最多为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">2^{n}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span></span> 个节点</p>
 </li>
-<li><p><code>n</code> 层二叉树最多有 $2^{n+1}-1$ 个节点</p>
+<li>
+<p><code>n</code> 层二叉树最多有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2^{n+1}-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 个节点</p>
 </li>
-<li><p>设二叉树叶节点数 <code>n0</code>，度为 <code>2</code> 的节点数 <code>n2</code>，则 $n_0&#x3D;n_2+1$</p>
+<li>
+<p>设二叉树叶节点数 <code>n0</code>，度为 <code>2</code> 的节点数 <code>n2</code>，则 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mn>0</mn></msub><mo>=</mo><msub><mi>n</mi><mn>2</mn></msub><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n_0=n_2+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></p>
 </li>
 </ul>
