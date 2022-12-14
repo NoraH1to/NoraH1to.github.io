@@ -1,27 +1,13 @@
 <hr>
-<p>title: 堆的添加和弹出<br>
-date: 2022-06-24 14:06:00<br>
-authors: NoraH1to<br>
-categories:</p>
-<ul>
-<li>[数据结构]<br>
-tags:</li>
-<li>堆</li>
-<li>数据结构</li>
-</ul>
-<hr>
-<p>我们以最小堆为例子，讲解如何添加、弹出堆中的元素</p>
-<h2 id="添加">添加</h2>
-<p>优先队列先进先出，所以从队尾添加：</p>
+<h2 id="title-堆的添加和弹出date-2022-06-24-14-06-00authors-NoraH1tocategories-数据结构-tags-堆-数据结构"><a href="#title-堆的添加和弹出date-2022-06-24-14-06-00authors-NoraH1tocategories-数据结构-tags-堆-数据结构" class="headerlink" title="title: 堆的添加和弹出date: 2022-06-24 14:06:00authors: NoraH1tocategories:  - [数据结构]tags:  - 堆  - 数据结构"></a>title: 堆的添加和弹出<br>date: 2022-06-24 14:06:00<br>authors: NoraH1to<br>categories:<br>  - [数据结构]<br>tags:<br>  - 堆<br>  - 数据结构</h2><p>我们以最小堆为例子，讲解如何添加、弹出堆中的元素</p>
+<h2 id="添加"><a href="#添加" class="headerlink" title="添加"></a>添加</h2><p>优先队列先进先出，所以从队尾添加：</p>
 <ol>
-<li>
-<p>添加到队尾</p>
+<li><p>添加到队尾</p>
 </li>
-<li>
-<p>检查是否小于父节点，是则上浮直到大于等于父节点</p>
+<li><p>检查是否小于父节点，是则上浮直到大于等于父节点</p>
 </li>
 </ol>
-<pre><code class="language-javascript">function minHeapAdd(array = [], element) {
+<pre><code class="javascript">function minHeapAdd(array = [], element) {
   array.push(element);
   if (array.length &gt; 1) {
     // 插入元素的索引
@@ -46,17 +32,14 @@ tags:</li>
   return array;
 }
 </code></pre>
-<h2 id="弹出">弹出</h2>
-<p>优先队列先进先出，所以从头部弹出：</p>
+<h2 id="弹出"><a href="#弹出" class="headerlink" title="弹出"></a>弹出</h2><p>优先队列先进先出，所以从头部弹出：</p>
 <ol>
-<li>
-<p>取出头部，并把尾部节点放到原头部位置</p>
+<li><p>取出头部，并把尾部节点放到原头部位置</p>
 </li>
-<li>
-<p>调整堆为最小堆（用到了<a href="../build#%E6%9C%80%E5%B0%8F%E5%A0%86">构建最小堆</a>中的函数）</p>
+<li><p>调整堆为最小堆（用到了<a href="../build#%E6%9C%80%E5%B0%8F%E5%A0%86">构建最小堆</a>中的函数）</p>
 </li>
 </ol>
-<pre><code class="language-javascript">function minHeapPop(array = []) {
+<pre><code class="javascript">function minHeapPop(array = []) {
   let result = null;
   // 如果堆有超过 1 个元素
   if (array.length &gt; 1) {

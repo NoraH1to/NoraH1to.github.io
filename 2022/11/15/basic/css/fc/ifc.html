@@ -1,32 +1,17 @@
 <hr>
-<p>title: 行内格式化上下文(IFC)<br>
-date: 2022-11-16 16:30:00<br>
-authors: NoraH1to<br>
-categories:</p>
+<h2 id="title-行内格式化上下文-IFC-date-2022-11-16-16-30-00authors-NoraH1tocategories-前端-css-格式化上下文-tags-css"><a href="#title-行内格式化上下文-IFC-date-2022-11-16-16-30-00authors-NoraH1tocategories-前端-css-格式化上下文-tags-css" class="headerlink" title="title: 行内格式化上下文(IFC)date: 2022-11-16 16:30:00authors: NoraH1tocategories:  - [前端, css, 格式化上下文]tags:  - css"></a>title: 行内格式化上下文(IFC)<br>date: 2022-11-16 16:30:00<br>authors: NoraH1to<br>categories:<br>  - [前端, css, 格式化上下文]<br>tags:<br>  - css</h2><h2 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h2><p>是<strong>行内</strong>的格式化上下文，<code>行内框</code>（<code>inline box</code>） 一个接一个的排列组成了它，排列顺序根据 <code>writing-mode</code>（书写模式）来决定：</p>
 <ul>
-<li>[前端, css, 格式化上下文]<br>
-tags:</li>
-<li>css</li>
-</ul>
-<hr>
-<h2 id="是什么">是什么</h2>
-<p>是<strong>行内</strong>的格式化上下文，<code>行内框</code>（<code>inline box</code>） 一个接一个的排列组成了它，排列顺序根据 <code>writing-mode</code>（书写模式）来决定：</p>
-<ul>
-<li>
-<p>水平书写模式，各个框<strong>从左到右</strong>水平的排列</p>
+<li><p>水平书写模式，各个框<strong>从左到右</strong>水平的排列</p>
 </li>
-<li>
-<p>垂直书写模式，各个框<strong>从顶部到底部</strong>开始水平的排列</p>
+<li><p>垂直书写模式，各个框<strong>从顶部到底部</strong>开始水平的排列</p>
 </li>
 </ul>
 <p>:::note</p>
 <p>行内框指 <code>文本</code>,<code>&lt;span&gt;&lt;/span&gt;</code> 和其它所有被指定成行内样式的元素，例如：</p>
 <ul>
-<li>
-<p><code>display: inline-block</code></p>
+<li><p><code>display: inline-block</code></p>
 </li>
-<li>
-<p><code>display: inline-flex</code></p>
+<li><p><code>display: inline-flex</code></p>
 </li>
 </ul>
 <p>:::</p>
@@ -35,68 +20,66 @@ tags:</li>
 <p>{% note default modern %}</p>
 <p>行框是一个概念，并不会实际显示</p>
 <p>{% endnote %}</p>
-<h2 id="创建方式">创建方式</h2>
-<p>块级元素中仅包含内联元素时，这些内联元素就组成了一个 <code>IFC</code></p>
+<h2 id="创建方式"><a href="#创建方式" class="headerlink" title="创建方式"></a>创建方式</h2><p>块级元素中仅包含内联元素时，这些内联元素就组成了一个 <code>IFC</code></p>
 <p>{% note default modern %}</p>
 <p>当 <code>IFC</code> 中插入了<strong>块级元素</strong>时，原本的 <code>IFC</code> 会被拆分成多个 <code>IFC</code>，例如</p>
-<pre><code class="language-html">&lt;div class=&quot;horizontal&quot;&gt;
-  NoraH1to's blog
+<pre><code class="html">&lt;div class=&quot;horizontal&quot;&gt;
+  NoraH1to&#39;s blog
   &lt;div&gt;突然插入&lt;/div&gt;
   horizontal
 &lt;/div&gt;
 </code></pre>
 <p>将会分割出两个 <code>IFC</code></p>
 <p>{% endnote %}</p>
-<h2 id="规则">规则</h2>
-<h3 id="书写模式">书写模式</h3>
-<p>很好理解，水平的时候就水平方向上排列，垂直的时候就在垂直方向上排列</p>
+<h2 id="规则"><a href="#规则" class="headerlink" title="规则"></a>规则</h2><h3 id="书写模式"><a href="#书写模式" class="headerlink" title="书写模式"></a>书写模式</h3><p>很好理解，水平的时候就水平方向上排列，垂直的时候就在垂直方向上排列</p>
 <p>下面例子中，两个 <code>div</code> 元素中的所有的单词分别组合起来，成为其行内格式化上下文</p>
 <iframe height="350" width="100%" scrolling="no" title="IFC-1" src="https://codepen.io/norah1to/embed/mdKMoxw?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href="https://codepen.io/norah1to/pen/mdKMoxw">
   IFC-1</a> by NoraH1to (<a href="https://codepen.io/norah1to">@norah1to</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
+
 <p>{% note default modern %}</p>
 <p><code>writing-mode</code> 属性还会影响块级元素的排列顺序，具体查阅<a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/writing-mode">MDN 文档</a></p>
 <p>{% endnote %}</p>
-<h3 id="边距边框">边距边框</h3>
-<p><code>border</code>, <code>padding</code>, <code>margin</code> 只会在行的方向上占据空间（水平排列时只在水平上占位，以此类推）</p>
+<h3 id="边距边框"><a href="#边距边框" class="headerlink" title="边距边框"></a>边距边框</h3><p><code>border</code>, <code>padding</code>, <code>margin</code> 只会在行的方向上占据空间（水平排列时只在水平上占位，以此类推）</p>
 <p><code>border</code> 会显示但不会占据空间</p>
 <iframe height="350" width="100%" scrolling="no" title="IFC-2" src="https://codepen.io/norah1to/embed/wvXqZOw?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href="https://codepen.io/norah1to/pen/wvXqZOw">
   IFC-2</a> by NoraH1to (<a href="https://codepen.io/norah1to">@norah1to</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
-<h3 id="换行时的样式">换行时的样式</h3>
-<p>一个 <code>行内框</code> 因为行框空间不足被分配到多行中时，<code>margin</code>, <code>border</code>, <code>padding</code> 均不会在断裂处生效</p>
+
+<h3 id="换行时的样式"><a href="#换行时的样式" class="headerlink" title="换行时的样式"></a>换行时的样式</h3><p>一个 <code>行内框</code> 因为行框空间不足被分配到多行中时，<code>margin</code>, <code>border</code>, <code>padding</code> 均不会在断裂处生效</p>
 <p>下面例子中可以看到 <code>span</code> 的断裂处，边框也断裂了</p>
 <iframe height="350" width="100%" scrolling="no" title="IFC-3" src="https://codepen.io/norah1to/embed/LYrjoNg?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href="https://codepen.io/norah1to/pen/LYrjoNg">
   IFC-3</a> by NoraH1to (<a href="https://codepen.io/norah1to">@norah1to</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
-<h3 id="块方向上的对齐">块方向上的对齐</h3>
-<p>行内框可以使用 <code>vertical-align</code> 属性来指定其<strong>在块的方向上</strong>的对齐方式</p>
+
+<h3 id="块方向上的对齐"><a href="#块方向上的对齐" class="headerlink" title="块方向上的对齐"></a>块方向上的对齐</h3><p>行内框可以使用 <code>vertical-align</code> 属性来指定其<strong>在块的方向上</strong>的对齐方式</p>
 <p>该属性中的 <code>vertical</code> 其实名不副实，书写方式为垂直时其效果为在水平上对齐</p>
 <iframe height="350" width="100%" scrolling="no" title="IFC-4" src="https://codepen.io/norah1to/embed/OJEjYmy?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href="https://codepen.io/norah1to/pen/OJEjYmy">
   IFC-4</a> by NoraH1to (<a href="https://codepen.io/norah1to">@norah1to</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
-<h3 id="行内方向上对齐">行内方向上对齐</h3>
-<p>可以使用 <code>text-align</code> 属性来指定在行内方向上的对齐方式，前提是还有剩余空间</p>
+
+<h3 id="行内方向上对齐"><a href="#行内方向上对齐" class="headerlink" title="行内方向上对齐"></a>行内方向上对齐</h3><p>可以使用 <code>text-align</code> 属性来指定在行内方向上的对齐方式，前提是还有剩余空间</p>
 <iframe height="350" width="100%" scrolling="no" title="IFC-5" src="https://codepen.io/norah1to/embed/ExRvzwp?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href="https://codepen.io/norah1to/pen/ExRvzwp">
   IFC-5</a> by NoraH1to (<a href="https://codepen.io/norah1to">@norah1to</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
-<h3 id="浮动元素的影响">浮动元素的影响</h3>
-<p>浮动元素会影响 <code>行框</code> 的宽(高)度</p>
+
+<h3 id="浮动元素的影响"><a href="#浮动元素的影响" class="headerlink" title="浮动元素的影响"></a>浮动元素的影响</h3><p>浮动元素会影响 <code>行框</code> 的宽(高)度</p>
 <iframe height="350" width="100%" scrolling="no" title="IFC-6" src="https://codepen.io/norah1to/embed/qBKXGYv?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href="https://codepen.io/norah1to/pen/qBKXGYv">
   IFC-6</a> by NoraH1to (<a href="https://codepen.io/norah1to">@norah1to</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
+
 <blockquote>
 <p>参考</p>
 <p><a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS/Inline_formatting_context">IFC | MDN</a></p>

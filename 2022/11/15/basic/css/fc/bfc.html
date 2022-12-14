@@ -1,63 +1,38 @@
 <hr>
-<p>title: 块级格式化上下文(BFC)<br>
-date: 2022-11-15 19:29:00<br>
-authors: NoraH1to<br>
-categories:</p>
+<h2 id="title-块级格式化上下文-BFC-date-2022-11-15-19-29-00authors-NoraH1tocategories-前端-css-格式化上下文-tags-css"><a href="#title-块级格式化上下文-BFC-date-2022-11-15-19-29-00authors-NoraH1tocategories-前端-css-格式化上下文-tags-css" class="headerlink" title="title: 块级格式化上下文(BFC)date: 2022-11-15 19:29:00authors: NoraH1tocategories:  - [前端, css, 格式化上下文]tags:  - css"></a>title: 块级格式化上下文(BFC)<br>date: 2022-11-15 19:29:00<br>authors: NoraH1to<br>categories:<br>  - [前端, css, 格式化上下文]<br>tags:<br>  - css</h2><h2 id="是什么"><a href="#是什么" class="headerlink" title="是什么"></a>是什么</h2><p>是<strong>块级</strong>的格式化上下文，其上下文内有其特定的布局规则，是浮动元素与其它元素可发生交互的区域</p>
+<h2 id="创建方式"><a href="#创建方式" class="headerlink" title="创建方式"></a>创建方式</h2><p>以下几个常用的方式会创建块级格式化上下文：</p>
 <ul>
-<li>[前端, css, 格式化上下文]<br>
-tags:</li>
-<li>css</li>
-</ul>
-<hr>
-<h2 id="是什么">是什么</h2>
-<p>是<strong>块级</strong>的格式化上下文，其上下文内有其特定的布局规则，是浮动元素与其它元素可发生交互的区域</p>
-<h2 id="创建方式">创建方式</h2>
-<p>以下几个常用的方式会创建块级格式化上下文：</p>
+<li><p><code>&lt;html&gt;&lt;/html&gt;</code> （根元素即是 BFC）</p>
+</li>
+<li><p><code>float</code> 不为 <code>none</code>（浮动元素）</p>
+</li>
+<li><p><code>position</code> 为 <code>absolute</code>,<code>fixed</code>（绝对定位元素）</p>
+</li>
+<li><p><code>display</code> 值为以下之一</p>
 <ul>
-<li>
-<p><code>&lt;html&gt;&lt;/html&gt;</code> （根元素即是 BFC）</p>
+<li><p>专门用于创建BFC的 <code>flow-root</code>，意在无副作用的创建BFC</p>
 </li>
-<li>
-<p><code>float</code> 不为 <code>none</code>（浮动元素）</p>
+<li><p>行内块级 <code>inline-block</code></p>
 </li>
-<li>
-<p><code>position</code> 为 <code>absolute</code>,<code>fixed</code>（绝对定位元素）</p>
-</li>
-<li>
-<p><code>display</code> 值为以下之一</p>
-<ul>
-<li>
-<p>专门用于创建BFC的 <code>flow-root</code>，意在无副作用的创建BFC</p>
-</li>
-<li>
-<p>行内块级 <code>inline-block</code></p>
-</li>
-<li>
-<p>表格相关 <code>table</code>,<code>table-cell</code>…</p>
+<li><p>表格相关 <code>table</code>,<code>table-cell</code>…</p>
 </li>
 </ul>
 </li>
-<li>
-<p>灵活布局(<code>flex</code>)或栅格布局(<code>grid</code>)的直接子元素（子元素不能为 <code>flex</code>,<code>grid</code> 或 <code>table</code> 容器）</p>
+<li><p>灵活布局(<code>flex</code>)或栅格布局(<code>grid</code>)的直接子元素（子元素不能为 <code>flex</code>,<code>grid</code> 或 <code>table</code> 容器）</p>
 </li>
 </ul>
 <p>其它详细的创建方法可查阅<a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Block_formatting_context">MDN 文档</a></p>
-<h2 id="作用">作用</h2>
-<p><code>BFC</code> 常常用来清除浮动，因为其效果有：</p>
+<h2 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h2><p><code>BFC</code> 常常用来清除浮动，因为其效果有：</p>
 <ul>
-<li>
-<p>包含内部浮动</p>
+<li><p>包含内部浮动</p>
 </li>
-<li>
-<p>排除外部浮动</p>
+<li><p>排除外部浮动</p>
 </li>
-<li>
-<p>阻止<a href="../../margin-collapsing">外边距重叠</a></p>
+<li><p>阻止<a href="../../margin-collapsing">外边距重叠</a></p>
 </li>
 </ul>
 <p>通俗来说就是 <strong>创建一个内外隔绝的环境，外部不会影响到内部，内部也不会影响到外部</strong></p>
-<h3 id="包含内部浮动">包含内部浮动</h3>
-<p>下面代码由一个父元素包裹两个同级的子元素，第二个子元素为浮动元素</p>
+<h3 id="包含内部浮动"><a href="#包含内部浮动" class="headerlink" title="包含内部浮动"></a>包含内部浮动</h3><p>下面代码由一个父元素包裹两个同级的子元素，第二个子元素为浮动元素</p>
 <p>由于第二个子元素是浮动的，所以会导致父元素高度坍塌</p>
 <p>但是当我们在父元素创建一个 <code>BFC</code> 后，就不会造成高度坍塌了，这是我们说的第一个特性：<code>包含内部浮动</code></p>
 <iframe height="350" width="100%" scrolling="no" title="BFC-1" src="https://codepen.io/norah1to/embed/JjZyGLp?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
@@ -65,22 +40,23 @@ tags:</li>
   BFC-1</a> by NoraH1to (<a href="https://codepen.io/norah1to">@norah1to</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
-<h3 id="排除外部浮动">排除外部浮动</h3>
-<p>两个同级元素，要构建一个左栏固定宽度 + 右侧填充的布局，左侧使用浮动的话会和右侧重叠</p>
+
+<h3 id="排除外部浮动"><a href="#排除外部浮动" class="headerlink" title="排除外部浮动"></a>排除外部浮动</h3><p>两个同级元素，要构建一个左栏固定宽度 + 右侧填充的布局，左侧使用浮动的话会和右侧重叠</p>
 <p>在右侧创建 <code>BFC</code> 后可以解决这个问题，这里利用了 <code>BFC</code> 的 <code>排除外部浮动</code> 特性</p>
 <iframe height="350" width="100%" scrolling="no" title="BFC-2" src="https://codepen.io/norah1to/embed/ZERJpRL?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href="https://codepen.io/norah1to/pen/ZERJpRL">
   BFC-2</a> by NoraH1to (<a href="https://codepen.io/norah1to">@norah1to</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
-<h3 id="阻止外边距重叠">阻止外边距重叠</h3>
-<p>一般可以通过给重叠的元素套一个父元素，并设置父元素的内边距 <code>padding</code>、<code>border</code> 等来防止外边距重叠，但如果当前元素不能设置这些属性，这时就要靠 <code>BFC</code> 了</p>
+
+<h3 id="阻止外边距重叠"><a href="#阻止外边距重叠" class="headerlink" title="阻止外边距重叠"></a>阻止外边距重叠</h3><p>一般可以通过给重叠的元素套一个父元素，并设置父元素的内边距 <code>padding</code>、<code>border</code> 等来防止外边距重叠，但如果当前元素不能设置这些属性，这时就要靠 <code>BFC</code> 了</p>
 <p>可以通过在元素外部包裹一个创建了 <code>BFC</code> 的元素来防止外边距重叠</p>
 <iframe height="350" width="100%" scrolling="no" title="BFC-3" src="https://codepen.io/norah1to/embed/yLEoVLb?default-tab=html%2Cresult&editable=true" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href="https://codepen.io/norah1to/pen/yLEoVLb">
   BFC-3</a> by NoraH1to (<a href="https://codepen.io/norah1to">@norah1to</a>)
   on <a href="https://codepen.io">CodePen</a>.
 </iframe>
+
 <blockquote>
 <p>参考</p>
 <p><a href="https://developer.mozilla.org/zh-CN/docs/Web/Guide/CSS/Block_formatting_context">BFC | MDN</a></p>
