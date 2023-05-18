@@ -1,0 +1,424 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Epub.js 实践、踩坑 | 乱炖锅</title><meta name="author" content="NoraH1to"><meta name="copyright" content="NoraH1to"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="前言epub.js 是一个强大的库，算是浏览器这块 epub 文件处理的大哥 但是由于项目时间线跨度大（7 年），API 不友好（相对现在的环境来说），再加上只进行了寥寥几次效果不理想的重构，导致这个库的问题非常多，文档非常简陋，类型声明文件更是一塌糊涂 个人在使用中踩了非常非常多的坑，在此记录，方便以后查阅 解析流程构建 epub 实例epub.js 许多接口，其中最直接的使用方法为调用其默认导">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Epub.js 实践、踩坑">
+<meta property="og:url" content="https://www.norah1to.com/2023/05/18/lib-usage/epub.js/index.html">
+<meta property="og:site_name" content="乱炖锅">
+<meta property="og:description" content="前言epub.js 是一个强大的库，算是浏览器这块 epub 文件处理的大哥 但是由于项目时间线跨度大（7 年），API 不友好（相对现在的环境来说），再加上只进行了寥寥几次效果不理想的重构，导致这个库的问题非常多，文档非常简陋，类型声明文件更是一塌糊涂 个人在使用中踩了非常非常多的坑，在此记录，方便以后查阅 解析流程构建 epub 实例epub.js 许多接口，其中最直接的使用方法为调用其默认导">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.norah1to.com/img/cover/epub.js.png">
+<meta property="article:published_time" content="2023-05-18T04:51:00.000Z">
+<meta property="article:modified_time" content="2023-05-18T12:41:08.383Z">
+<meta property="article:author" content="NoraH1to">
+<meta property="article:tag" content="epub.js">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.norah1to.com/img/cover/epub.js.png"><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="https://www.norah1to.com/2023/05/18/lib-usage/epub.js/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: {"appId":"H8C9SVEHPQ","apiKey":"9e542d4b5b2d39f4bec26306d2eb4034","indexName":"index","hits":{"per_page":6},"languages":{"input_placeholder":"搜索文章","hits_empty":"找不到您查询的内容：${query}","hits_stats":"找到 ${hits} 条结果，用时 ${time} 毫秒"}},
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: NoraH1to","link":"链接: ","source":"来源: 乱炖锅","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"bottom-left"},
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Epub.js 实践、踩坑',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-05-18 20:41:08'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+          const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+          const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+          if (t === undefined) {
+            if (isLightMode) activateLightMode()
+            else if (isDarkMode) activateDarkMode()
+            else if (isNotSpecified || hasNoSupport) {
+              const now = new Date()
+              const hour = now.getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/main.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">68</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">29</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/cover/epub.js.png')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">乱炖锅</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Epub.js 实践、踩坑</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-05-18T04:51:00.000Z" title="发表于 2023-05-18 12:51:00">2023-05-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-05-18T12:41:08.383Z" title="更新于 2023-05-18 20:41:08">2023-05-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%89%8D%E7%AB%AF/">前端</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%89%8D%E7%AB%AF/%E8%B8%A9%E5%9D%91/">踩坑</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>12分钟</span></span><span class="post-meta-separator">|</span><span id="" data-flag-title="Epub.js 实践、踩坑"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="twikoo_visitors"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><a target="_blank" rel="noopener" href="https://github.com/futurepress/epub.js"><code>epub.js</code></a> 是一个强大的库，算是浏览器这块 epub 文件处理的大哥</p>
+<p>但是由于项目时间线跨度大（7 年），API 不友好（相对现在的环境来说），再加上只进行了寥寥几次效果不理想的重构，导致这个库的问题非常多，文档非常简陋，类型声明文件更是一塌糊涂</p>
+<p>个人在使用中踩了非常非常多的坑，在此记录，方便以后查阅</p>
+<h1 id="解析流程"><a href="#解析流程" class="headerlink" title="解析流程"></a>解析流程</h1><h2 id="构建-epub-实例"><a href="#构建-epub-实例" class="headerlink" title="构建 epub 实例"></a>构建 epub 实例</h2><p><code>epub.js</code> 许多接口，其中最直接的使用方法为调用其默认导出的函数，传入文件供其解析</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Epub</span> <span class="keyword">from</span> <span class="string">&#x27;epubjs&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> epub = <span class="title class_">Epub</span>(target, options); <span class="comment">// 返回 Book 实例</span></span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>target</code> 可以是多种类型的数据：</p>
+<ul>
+<li><p><strong>二进制</strong>：即 <code>ArrayBuffer</code></p>
+</li>
+<li><p><strong>BASE64</strong>：base64 字符串，使用该类型需要设置 <code>options.encoding = &#39;base64&#39;</code></p>
+</li>
+<li><p><strong>链接</strong>：通过 http 协议获取远程文件</p>
+<p>需要注意该链接必须以 <code>.epub</code> 结尾，在源码中 <code>determineType</code> 负责解析输入类型：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">determineType</span>(<span class="params">input</span>) &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 只有文件类型为 epub 时才会返回 INPUT_TYPE.EPUB 类型</span></span><br><span class="line">  <span class="keyword">if</span>(extension === <span class="string">&quot;epub&quot;</span>)&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="variable constant_">INPUT_TYPE</span>.<span class="property">EPUB</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>而只有 <code>INPUT_TYPE.EPUB</code> 类型才会通过 http 协议请求：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">type</span> === <span class="variable constant_">INPUT_TYPE</span>.<span class="property">EPUB</span>) &#123;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">archived</span> = <span class="literal">true</span>;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">url</span> = <span class="keyword">new</span> <span class="title class_">Url</span>(<span class="string">&quot;/&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">  opening = <span class="variable language_">this</span>.<span class="title function_">request</span>(input, <span class="string">&quot;binary&quot;</span>, <span class="variable language_">this</span>.<span class="property">settings</span>.<span class="property">requestCredentials</span>, <span class="variable language_">this</span>.<span class="property">settings</span>.<span class="property">requestHeaders</span>)</span><br><span class="line">    .<span class="title function_">then</span>(<span class="variable language_">this</span>.<span class="property">openEpub</span>.<span class="title function_">bind</span>(<span class="variable language_">this</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="解包"><a href="#解包" class="headerlink" title="解包"></a>解包</h2><p>经过上面的解析，最后会拿到二进制数据，开始解包：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_">unarchive</span>(<span class="params">input, encoding</span>) &#123;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">archive</span> = <span class="keyword">new</span> <span class="title class_">Archive</span>(); <span class="comment">// 构建一个 Archive 实例</span></span><br><span class="line">  <span class="comment">/**</span></span><br><span class="line"><span class="comment">   * epub 文件本质是一个压缩包，archive.open 使用 JSZip 库来解压数据并保存到实例内</span></span><br><span class="line"><span class="comment">   */</span></span><br><span class="line">  <span class="keyword">return</span> <span class="variable language_">this</span>.<span class="property">archive</span>.<span class="title function_">open</span>(input, encoding); <span class="comment">// 然后调用 open</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解压数据后，根据 <code>epub</code> 标准，解析 <code>rootfile</code>（根文件） 的位置，rootfile 中存放了 <code>epub</code> 中所有的信息（xml 格式）：</p>
+<ul>
+<li><p>书名、作者、出版社、简介、发布者、制作时间…</p>
+</li>
+<li><p>目录文件路径（也是 xml）</p>
+</li>
+<li><p>所有页面、图片资源的路径</p>
+</li>
+</ul>
+<p>具体实现有点 💩 山的味道了，A 调用 B、B 调用 C、C 调用 D，又长又绕…伪代码如下：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据 epub 规范的路径拿到 rootfile 位置</span></span><br><span class="line"><span class="keyword">const</span> containerXml = <span class="keyword">await</span> <span class="title function_">load</span>(<span class="variable constant_">CONTAINER_PATH</span>);</span><br><span class="line"><span class="keyword">const</span> rootfilePath = <span class="title function_">resolvePath</span>(<span class="keyword">new</span> <span class="title class_">Container</span>(containerXml).<span class="property">packagePath</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据 rootfile 位置解析书本信息</span></span><br><span class="line"><span class="keyword">const</span> rootFileXml = <span class="keyword">await</span> <span class="title function_">load</span>(rootfilePath);</span><br><span class="line"><span class="keyword">const</span> package = <span class="keyword">new</span> <span class="title class_">Packging</span>(rootFileXml);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 所有页面信息</span></span><br><span class="line"><span class="variable language_">this</span>.<span class="property">spine</span> = ...</span><br><span class="line"><span class="comment">// 所有资源路径，包括页面</span></span><br><span class="line"><span class="variable language_">this</span>.<span class="property">resource</span> = ...</span><br><span class="line"><span class="comment">// 目录</span></span><br><span class="line"><span class="variable language_">this</span>.<span class="property">nav</span> = ...</span><br></pre></td></tr></table></figure>
+
+<p>看着就几行是吧，实际上的复杂度比这个高非常多…</p>
+<h2 id="（预）渲染"><a href="#（预）渲染" class="headerlink" title="（预）渲染"></a>（预）渲染</h2><p>到这里 Book 实例构建完成，接着（预）渲染到页面上：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// el 可以是 dom 对象，也可以是节点的 id</span></span><br><span class="line"><span class="keyword">const</span> rendition = epub.<span class="title function_">renderTo</span>(el, options);</span><br></pre></td></tr></table></figure>
+
+<p><code>options</code> 签名如下（我看完源码修正过的）：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="title class_">RenditionOptions</span> = &#123;</span><br><span class="line">  width?: <span class="built_in">string</span> | <span class="built_in">number</span>; <span class="comment">// 视图宽度</span></span><br><span class="line">  height?: <span class="built_in">string</span> | <span class="built_in">number</span>; <span class="comment">// 视图高度</span></span><br><span class="line">  ignoreClass?: <span class="built_in">string</span>; <span class="comment">// 忽略类名</span></span><br><span class="line">  manager?: <span class="string">&#x27;continuous&#x27;</span> | <span class="string">&#x27;default&#x27;</span>; <span class="comment">// 布局管理器</span></span><br><span class="line">  view?: <span class="string">&#x27;iframe&#x27;</span> | <span class="title class_">Object</span> | <span class="title class_">Function</span>; <span class="comment">// 视图容器</span></span><br><span class="line">  flow?: <span class="string">&#x27;paginated&#x27;</span> | <span class="string">&#x27;scrolled&#x27;</span>; <span class="comment">// 阅读方式</span></span><br><span class="line">  layout?: <span class="built_in">string</span>; <span class="comment">// <span class="doctag">TODO:</span> 我没看懂</span></span><br><span class="line">  spread?: <span class="string">&#x27;none&#x27;</span> | <span class="built_in">boolean</span>; <span class="comment">// 是否显示双页</span></span><br><span class="line">  minSpreadWidth?: <span class="built_in">number</span>; <span class="comment">// 最小触发双页的宽度</span></span><br><span class="line">  resizeOnOrientationChange?: <span class="built_in">boolean</span>; <span class="comment">// 在窗口 resize 时调整内容尺寸</span></span><br><span class="line">  script?: <span class="built_in">string</span>; <span class="comment">// 注入到 View 中的 js 代码</span></span><br><span class="line">  stylesheet?: <span class="built_in">string</span>; <span class="comment">// 注入到 View 中的 css 样式</span></span><br><span class="line">  infinite?: <span class="built_in">boolean</span>; <span class="comment">// 是否无限翻页</span></span><br><span class="line">  overflow?: <span class="built_in">string</span>; <span class="comment">// 设置视图的 CSS overflow 属性</span></span><br><span class="line">  snap?: <span class="built_in">boolean</span>; <span class="comment">// 是否支持翻页</span></span><br><span class="line">  defaultDirection?: <span class="built_in">string</span>; <span class="comment">// 阅读方向</span></span><br><span class="line">  allowScriptedContent?: <span class="built_in">boolean</span>; <span class="comment">// iframe 沙盒是否能够执行 js</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这里开始就有不少坑了，我先说下各个属性的作用，一眼就知道的就掠过：</p>
+<ul>
+<li><p><strong>manager</strong>:</p>
+<p>为 <code>default</code> 时，<code>manager</code>（视图管理器）只会同时挂载<strong>一个</strong> <code>view</code>（视图），具体表现如下图所示：</p>
+<p><img src="/2023/05/18/lib-usage/epub.js/manager_default.png"></p>
+<p><code>continuous</code>（连续的） 时会预加载前后的页面，同时挂载<strong>多个</strong> view，表现如下：</p>
+<p><img src="/2023/05/18/lib-usage/epub.js/manager_continuous.png"></p>
+<!-- 当 `manager = 'default'`，如果 `flow = 'paginated'`，当你处于某章节的第一页并翻到上一页，正常来说应该定位到**上一章的最后一页**，但是这里会直接定位到**上一章的第一页** -->
+</li>
+<li><p><strong>view</strong>:</p>
+<p>这里只能填 <code>iframe</code>，官方文档写着能传 <code>inline</code>，但实际上代码里没有处理：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> view == <span class="string">&#x27;string&#x27;</span> &amp;&amp; view === <span class="string">&#x27;iframe&#x27;</span>) &#123;</span><br><span class="line">  <span class="title class_">View</span> = <span class="title class_">IframeView</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  <span class="comment">// 如果我们传了 inline，会出错</span></span><br><span class="line">  <span class="comment">// otherwise, assume we were passed a class function</span></span><br><span class="line">  <span class="title class_">View</span> = view;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>InlineView</code> 其实存在，我不建议使用，问题很多：</p>
+<ul>
+<li><p>样式隔离、代码隔离</p>
+</li>
+<li><p>各种未知问题（这个 view 上次维护是在 <strong>6 年前</strong>）</p>
+</li>
+</ul>
+</li>
+<li><p><strong>flow</strong>:</p>
+<p>对应两种操作方式，<code>paginated</code>（分页）即传统的左右翻页</p>
+<p><code>scrolled</code> 则是垂直的滚动阅读方式</p>
+</li>
+<li><p><strong>spread</strong>:</p>
+<p>是否显示双页，仅在 <code>flow = paginated</code> 时生效</p>
+</li>
+<li><p><strong>script, stylesheet</strong>:</p>
+<p>这两项不是代码字符串，它们分别为 <code>link</code>,<code>style</code> 标签的 <code>href</code> 属性，标签会被注入到每个 view 的 <code>head</code> 中，</p>
+</li>
+<li><p><strong>infinite</strong>:</p>
+<p>这玩意根本就没实现，无效</p>
+</li>
+<li><p><strong>snp</strong>:</p>
+<p>是否支持翻页，仅在 <code>manager = continuous</code> 时生效</p>
+<p>有坑，可能会使翻页失效，后面会说</p>
+</li>
+</ul>
+<h2 id="渲染"><a href="#渲染" class="headerlink" title="渲染"></a>渲染</h2><p>上面其实只渲染了容器，但是 epub 的内容还未展示到页面上</p>
+<p>此时我们需要调用 <code>rendition</code>（渲染器）的 <code>display</code> 方法渲染内容：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">await</span> rendition.<span class="title function_">display</span>(target);</span><br></pre></td></tr></table></figure>
+
+<p><code>target</code> 可以是非常多的东西：</p>
+<ul>
+<li><p>目录的 <code>href</code>，也有坑，后面说</p>
+</li>
+<li><p><code>epub-cfi</code>，建议自己 google 一下</p>
+</li>
+<li><p><code>0 ~ 1</code> 的浮点数，代表进度 <code>0 ~ 100 %</code></p>
+</li>
+</ul>
+<p>然后我们就能看到书本的内容了</p>
+<h1 id="踩坑"><a href="#踩坑" class="headerlink" title="踩坑"></a>踩坑</h1><h2 id="toc（目录）-路径问题"><a href="#toc（目录）-路径问题" class="headerlink" title="toc（目录） 路径问题"></a>toc（目录） 路径问题</h2><p>当你需要点击目录跳转到对应页面时，会有下面代码:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">await</span> rendition.<span class="title function_">display</span>(toc.<span class="property">href</span>);</span><br></pre></td></tr></table></figure>
+
+<p>对于绝大部分图书来说，这样写不会有问题，但是有少部分图书目录的 <code>href</code> 比较怪，举个例子：</p>
+<blockquote>
+<p><code>Text/Section01.html</code>，没有问题</p>
+<p>但如果为 <code>../Text/Section01.html</code>, <code>/Text/Section01.html</code> 或 <code>Text/Section01.html#head-1</code>，上面的代码将会跳转失败</p>
+</blockquote>
+<p>这与 epubjs 的实现有关:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 百分比的情况</span></span><br><span class="line"><span class="keyword">if</span> (<span class="variable language_">this</span>.<span class="property">book</span>.<span class="property">locations</span>.<span class="title function_">length</span>() &amp;&amp; <span class="title function_">isFloat</span>(target)) &#123;</span><br><span class="line">  target = <span class="variable language_">this</span>.<span class="property">book</span>.<span class="property">locations</span>.<span class="title function_">cfiFromPercentage</span>(<span class="built_in">parseFloat</span>(target));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 目录路径的情况</span></span><br><span class="line">section = <span class="variable language_">this</span>.<span class="property">book</span>.<span class="property">spine</span>.<span class="title function_">get</span>(target);</span><br></pre></td></tr></table></figure>
+
+<p>重点就在 <code>this.book.spine.get(target)</code>，spine 是根据 rootfile 生成的，下面是某个 rootfile 中的 spine:</p>
+<p><img src="/2023/05/18/lib-usage/epub.js/rootfile_spine_xml.png"></p>
+<p>它会根据 <code>idhref</code>，在 rootfile 中的 manifest 找到对应的 <code>href</code>:</p>
+<p><img src="/2023/05/18/lib-usage/epub.js/rootfile_manifest_xml.png"></p>
+<blockquote>
+<p>manifest 的 href 是不会添油加醋的</p>
+</blockquote>
+<p>生成这样数据结构的 spine:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> spine = &#123;</span><br><span class="line">  <span class="attr">items</span>: [</span><br><span class="line">    &#123; <span class="attr">idhref</span>: <span class="string">&#x27;Section001.xhtml&#x27;</span>, <span class="attr">href</span>: <span class="string">&#x27;Text/Section001.xhtml&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">idhref</span>: <span class="string">&#x27;Section002.xhtml&#x27;</span>, <span class="attr">href</span>: <span class="string">&#x27;Text/Section002.xhtml&#x27;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">idhref</span>: <span class="string">&#x27;Section002.xhtml&#x27;</span>, <span class="attr">href</span>: <span class="string">&#x27;Text/Section003.xhtml&#x27;</span> &#125;,</span><br><span class="line">    <span class="comment">// ... 其余内容</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="attr">itemsByHref</span>: &#123;</span><br><span class="line">    <span class="string">&#x27;Text/Section001.xhtml&#x27;</span>: &#123;</span><br><span class="line">      <span class="attr">idhref</span>: <span class="string">&#x27;Section001.xhtml&#x27;</span>,</span><br><span class="line">      <span class="attr">href</span>: <span class="string">&#x27;Text/Section001.xhtml&#x27;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">&#x27;Text/Section002.xhtml&#x27;</span>: &#123;</span><br><span class="line">      <span class="attr">idhref</span>: <span class="string">&#x27;Section002.xhtml&#x27;</span>,</span><br><span class="line">      <span class="attr">href</span>: <span class="string">&#x27;Text/Section002.xhtml&#x27;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">&#x27;Text/Section003.xhtml&#x27;</span>: &#123;</span><br><span class="line">      <span class="attr">idhref</span>: <span class="string">&#x27;Section003.xhtml&#x27;</span>,</span><br><span class="line">      <span class="attr">href</span>: <span class="string">&#x27;Text/Section003.xhtml&#x27;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">// ... 其余内容</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="comment">// ... 其余内容</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><code>spine.get</code> 会在 <code>itemByHref</code> 中查找其对应的 item，如果找不到就会返回空，有些书的目录会额外增加一些乱七八糟的东西，例如下面这一个目录项长这样:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">navPoint</span> <span class="attr">id</span>=<span class="string">&quot;navPoint-9&quot;</span> <span class="attr">playOrder</span>=<span class="string">&quot;9&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">navLabel</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">text</span>&gt;</span>②不管何时雪之下雪乃都会贯彻始终<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">navLabel</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 后面多了锚点 #heading_id_2 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">content</span> <span class="attr">src</span>=<span class="string">&quot;Text/Section008.xhtml#heading_id_2&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">navPoint</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>此时我们拿 <code>&quot;Text/Section008.xhtml#heading_id_2&quot;</code> 在 spine 中查找 item，那自然是找不到</p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>自己处理一遍 toc，这是我项目中的代码（简略版）:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="attr">toc</span>: <span class="title class_">IToc</span>[] = (<span class="keyword">await</span> epub.<span class="property">loaded</span>.<span class="property">navigation</span>).<span class="property">toc</span>.<span class="title function_">map</span>(<span class="function">(<span class="params">t</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (t.<span class="property">href</span>.<span class="title function_">startsWith</span>(<span class="string">&#x27;/&#x27;</span>)) t.<span class="property">href</span> = t.<span class="property">href</span>.<span class="title function_">replace</span>(<span class="string">&#x27;/&#x27;</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (t.<span class="property">href</span>.<span class="title function_">startsWith</span>(<span class="string">&#x27;../&#x27;</span>)) t.<span class="property">href</span> = t.<span class="property">href</span>.<span class="title function_">replace</span>(<span class="string">&#x27;../&#x27;</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">  t.<span class="property">href</span> = t.<span class="property">href</span>.<span class="title function_">replace</span>(<span class="regexp">/(?!^)#.*/</span>, <span class="string">&#x27;&#x27;</span>);</span><br><span class="line">  <span class="keyword">return</span> &#123; ...t &#125;;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="获得当前页的-toc"><a href="#获得当前页的-toc" class="headerlink" title="获得当前页的 toc"></a>获得当前页的 toc</h2><p>当我们需要获得当前页面的 toc 时，首先得从 rendition 中获得当前的 loc，拿 loc.href 去 toc 中找对应的目录:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">getCurrentProcess</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="comment">// epub 更新 loc 的时机较难琢磨，在更新途中甚至会拿到 undefined，这里确保 loc 确实存在</span></span><br><span class="line">  <span class="keyword">await</span> <span class="variable language_">this</span>.<span class="title function_">ensureLoc</span>();</span><br><span class="line">  <span class="comment">// loc 有两种获得方式，第一种方式得到的数据可靠，但是偶尔内容为空...第二种只有在第一种内容为空时可靠，但我找不到原因（源码真的太乱了）</span></span><br><span class="line">  <span class="keyword">const</span> loc = <span class="variable language_">this</span>.<span class="title function_">getLoc</span>();</span><br><span class="line">  <span class="keyword">if</span> (!loc) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    <span class="attr">value</span>: loc.<span class="property">start</span>.<span class="property">cfi</span>,</span><br><span class="line">    <span class="attr">ts</span>: <span class="title class_">Date</span>.<span class="title function_">now</span>(),</span><br><span class="line">    <span class="attr">percent</span>: <span class="variable language_">this</span>.<span class="property">epub</span>.<span class="property">locations</span>.<span class="title function_">percentageFromCfi</span>(loc.<span class="property">start</span>.<span class="property">cfi</span>),</span><br><span class="line">    <span class="comment">// 遍历我们上一节里自己生成的 toc，找到与当前 loc.href 吻合的取出</span></span><br><span class="line">    <span class="attr">navInfo</span>: <span class="variable language_">this</span>.<span class="property">toc</span>.<span class="title function_">find</span>(<span class="function">(<span class="params">&#123; href &#125;</span>) =&gt;</span> href.<span class="title function_">startsWith</span>(loc.<span class="property">start</span>.<span class="property">href</span>)),</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>问题会出现在 toc 的遍历上</p>
+<p>假设我们有一本书，它有着这些页面:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/cover.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;cover.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/message.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;message.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/contents.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;contents.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section001.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section001.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section002.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section002.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section003.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section003.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section007.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section007.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section008.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section008.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section004.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section004.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section005.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section005.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section006.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section006.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section009.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section009.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span></span></span><br><span class="line"><span class="tag">  <span class="attr">href</span>=<span class="string">&quot;Text/Section010.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">id</span>=<span class="string">&quot;Section010.xhtml&quot;</span></span></span><br><span class="line"><span class="tag">  <span class="attr">media-type</span>=<span class="string">&quot;application/xhtml+xml&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>同时它的目录如下:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">navPoint</span> <span class="attr">id</span>=<span class="string">&quot;section001&quot;</span> <span class="attr">playOrder</span>=<span class="string">&quot;3&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">navLabel</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">text</span>&gt;</span>简介&lt;/text</span><br><span class="line">  <span class="tag">&lt;/<span class="name">navLabel</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">content</span> <span class="attr">src</span>=<span class="string">&quot;Text/Section001.xhtml&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">navPoint</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">navPoint</span> <span class="attr">id</span>=<span class="string">&quot;section002&quot;</span> <span class="attr">playOrder</span>=<span class="string">&quot;4&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">navLabel</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">text</span>&gt;</span>年表<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">navLabel</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">content</span> <span class="attr">src</span>=<span class="string">&quot;Text/Section002.xhtml&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">navPoint</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">navPoint</span> <span class="attr">id</span>=<span class="string">&quot;section003&quot;</span> <span class="attr">playOrder</span>=<span class="string">&quot;5&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">navLabel</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">text</span>&gt;</span>彩页<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">navLabel</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">content</span> <span class="attr">src</span>=<span class="string">&quot;Text/Section003.xhtml&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">navPoint</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">navPoint</span> <span class="attr">id</span>=<span class="string">&quot;section005&quot;</span> <span class="attr">playOrder</span>=<span class="string">&quot;6&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">navLabel</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">text</span>&gt;</span>4／伽蓝之洞 『　』<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">navLabel</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">content</span> <span class="attr">src</span>=<span class="string">&quot;Text/Section005.xhtml&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">navPoint</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">navPoint</span> <span class="attr">id</span>=<span class="string">&quot;section009&quot;</span> <span class="attr">playOrder</span>=<span class="string">&quot;7&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">navLabel</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">text</span>&gt;</span>境界式<span class="tag">&lt;/<span class="name">text</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">navLabel</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">content</span> <span class="attr">src</span>=<span class="string">&quot;Text/Section009.xhtml&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">navPoint</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>此时，如果我们正处在 <code>&quot;Text/Section006.xhtml&quot;</code>，loc 中的 href 就会是 <code>&quot;Text/Section006.xhtml&quot;</code>，但是我们观察目录可以得知，<strong>toc 里没有对应的目录</strong>，那么 navInfo（章节信息）就会为空</p>
+<h3 id="解决-1"><a href="#解决-1" class="headerlink" title="解决"></a>解决</h3><p>大部分的图书，两个目录之间的章节都应该属于前一个目录，所以我们需要额外生成一个哈希表，<strong>为没有目录的章节指向它们前面的目录</strong>:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 先拍平 toc（toc 是可以嵌套的）</span></span><br><span class="line"><span class="variable language_">this</span>.<span class="property">flatToc</span> = <span class="title function_">flatArrayWithKey</span>(target.<span class="property">toc</span>, <span class="string">&#x27;children&#x27;</span>);</span><br><span class="line"><span class="comment">// 生成最开始的哈希表</span></span><br><span class="line"><span class="variable language_">this</span>.<span class="property">flatToc</span>.<span class="title function_">forEach</span>(<span class="function">(<span class="params">item</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">this</span>.<span class="property">hrefMap</span>[item.<span class="property">href</span>] = item;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">const</span> spine = <span class="variable language_">this</span>.<span class="property">epub</span>.<span class="property">spine</span> <span class="keyword">as</span> <span class="title class_">Spine</span>;</span><br><span class="line"><span class="comment">// 指向下一目录</span></span><br><span class="line"><span class="keyword">let</span> nextTocIndex = <span class="number">0</span>;</span><br><span class="line"><span class="comment">// 指向上一目录</span></span><br><span class="line"><span class="keyword">let</span> prevTocIndex = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">const</span> maxTocIndex = <span class="variable language_">this</span>.<span class="property">flatToc</span>.<span class="property">length</span> - <span class="number">1</span>;</span><br><span class="line"><span class="comment">// 遍历 spine.items（所有页面）</span></span><br><span class="line">spine.<span class="property">items</span>.<span class="title function_">forEach</span>(<span class="function">(<span class="params">sp</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 如果当前章节已经有目录</span></span><br><span class="line">  <span class="keyword">if</span> (sp.<span class="property">href</span> === <span class="variable language_">this</span>.<span class="property">flatToc</span>[nextTocIndex].<span class="property">href</span>) &#123;</span><br><span class="line">    <span class="comment">// 更新上一目录</span></span><br><span class="line">    prevTocIndex = nextTocIndex;</span><br><span class="line">    <span class="comment">// 更新下一目录</span></span><br><span class="line">    <span class="keyword">if</span> (nextTocIndex &lt; maxTocIndex) &#123;</span><br><span class="line">      nextTocIndex++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果当前章节没有目录</span></span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!<span class="variable language_">this</span>.<span class="property">hrefMap</span>[sp.<span class="property">href</span>]) &#123;</span><br><span class="line">    <span class="comment">// 指向上一目录</span></span><br><span class="line">    <span class="variable language_">this</span>.<span class="property">hrefMap</span>[sp.<span class="property">href</span>] = <span class="variable language_">this</span>.<span class="property">flatToc</span>[prevTocIndex];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>非常简单的双指针算法，此时所有章节都指向了其所属目录</p>
+<p>最后修改一下 <code>getCurrentProcess</code> 方法:</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">getCurrentProcess</span> = <span class="keyword">async</span> (<span class="params"></span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="variable language_">this</span>.<span class="title function_">ensureLoc</span>();</span><br><span class="line">  <span class="keyword">const</span> loc = <span class="variable language_">this</span>.<span class="title function_">getLoc</span>();</span><br><span class="line">  <span class="keyword">if</span> (!loc) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    <span class="attr">value</span>: loc.<span class="property">start</span>.<span class="property">cfi</span>,</span><br><span class="line">    <span class="attr">ts</span>: <span class="title class_">Date</span>.<span class="title function_">now</span>(),</span><br><span class="line">    <span class="attr">percent</span>: <span class="variable language_">this</span>.<span class="property">epub</span>.<span class="property">locations</span>.<span class="title function_">percentageFromCfi</span>(loc.<span class="property">start</span>.<span class="property">cfi</span>),</span><br><span class="line">    <span class="attr">navInfo</span>: <span class="title class_">Object</span>.<span class="title function_">entries</span>(<span class="variable language_">this</span>.<span class="property">hrefMap</span>).<span class="title function_">find</span>(<span class="function">(<span class="params">[key]</span>) =&gt;</span></span><br><span class="line">      key.<span class="title function_">startsWith</span>(loc.<span class="property">start</span>.<span class="property">href</span>)</span><br><span class="line">    )?.[<span class="number">1</span>],</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：这种方法有一定局限性</p>
+<p>（极少）部分图书的目录是乱序的，此时该算法为<strong>没有目录的章节</strong>指向的目录会出现错乱</p>
+<p>目前无解，这是文件本身的问题</p>
+</blockquote>
+<h2 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h2></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://www.norah1to.com">NoraH1to</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://www.norah1to.com/2023/05/18/lib-usage/epub.js/">https://www.norah1to.com/2023/05/18/lib-usage/epub.js/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.norah1to.com" target="_blank">乱炖锅</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/epub-js/">epub.js</a></div><div class="post_share"><div class="social-share" data-image="/img/cover/epub.js.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2023/04/18/mobile/web/shit-mobile-safari/"><img class="next-cover" src="/img/cover/shit_safari.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">让人头大的 Safari mobile 适配</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="twikoo-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">NoraH1to</div><div class="author-info__description">以我残躯化作烈火</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">68</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">29</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://space.bilibili.com/11171730/"><i class="fab fa-bilibili"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="mailto:sterbenlixuan@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://github.com/NoraH1to" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="http://steamcommunity.com/profiles/76561198239304782/" target="_blank" title="Steam"><i class="fa-brands fa-steam"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E6%B5%81%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">解析流程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA-epub-%E5%AE%9E%E4%BE%8B"><span class="toc-number">2.1.</span> <span class="toc-text">构建 epub 实例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%8C%85"><span class="toc-number">2.2.</span> <span class="toc-text">解包</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%EF%BC%88%E9%A2%84%EF%BC%89%E6%B8%B2%E6%9F%93"><span class="toc-number">2.3.</span> <span class="toc-text">（预）渲染</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B8%B2%E6%9F%93"><span class="toc-number">2.4.</span> <span class="toc-text">渲染</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91"><span class="toc-number">3.</span> <span class="toc-text">踩坑</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#toc%EF%BC%88%E7%9B%AE%E5%BD%95%EF%BC%89-%E8%B7%AF%E5%BE%84%E9%97%AE%E9%A2%98"><span class="toc-number">3.1.</span> <span class="toc-text">toc（目录） 路径问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3"><span class="toc-number">3.1.1.</span> <span class="toc-text">解决</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%8E%B7%E5%BE%97%E5%BD%93%E5%89%8D%E9%A1%B5%E7%9A%84-toc"><span class="toc-number">3.2.</span> <span class="toc-text">获得当前页的 toc</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3-1"><span class="toc-number">3.2.1.</span> <span class="toc-text">解决</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD"><span class="toc-number">3.3.</span> <span class="toc-text">未完待续</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/05/18/lib-usage/epub.js/" title="Epub.js 实践、踩坑"><img src="/img/cover/epub.js.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Epub.js 实践、踩坑"/></a><div class="content"><a class="title" href="/2023/05/18/lib-usage/epub.js/" title="Epub.js 实践、踩坑">Epub.js 实践、踩坑</a><time datetime="2023-05-18T04:51:00.000Z" title="发表于 2023-05-18 12:51:00">2023-05-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/04/18/mobile/web/shit-mobile-safari/" title="让人头大的 Safari mobile 适配"><img src="/img/cover/shit_safari.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="让人头大的 Safari mobile 适配"/></a><div class="content"><a class="title" href="/2023/04/18/mobile/web/shit-mobile-safari/" title="让人头大的 Safari mobile 适配">让人头大的 Safari mobile 适配</a><time datetime="2023-04-18T06:35:00.000Z" title="发表于 2023-04-18 14:35:00">2023-04-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/01/16/front-end-engineering/best-practices-of-lint/" title="前端项目 lint 个人实践"><img src="/img/cover/eslint_1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="前端项目 lint 个人实践"/></a><div class="content"><a class="title" href="/2023/01/16/front-end-engineering/best-practices-of-lint/" title="前端项目 lint 个人实践">前端项目 lint 个人实践</a><time datetime="2023-01-16T10:16:00.000Z" title="发表于 2023-01-16 18:16:00">2023-01-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/23/basic/javascript/new/" title="new 关键字"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="new 关键字"/></a><div class="content"><a class="title" href="/2022/11/23/basic/javascript/new/" title="new 关键字">new 关键字</a><time datetime="2022-11-23T08:05:00.000Z" title="发表于 2022-11-23 16:05:00">2022-11-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/11/19/vue3/vuetify/source-code/use-render/" title="Vuetify v3（2）- useRender"><img src="/img/cover_post.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vuetify v3（2）- useRender"/></a><div class="content"><a class="title" href="/2022/11/19/vue3/vuetify/source-code/use-render/" title="Vuetify v3（2）- useRender">Vuetify v3（2）- useRender</a><time datetime="2022-11-19T09:05:00.000Z" title="发表于 2022-11-19 17:05:00">2022-11-19</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By NoraH1to</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div id="algolia-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="search-wrap"><div id="algolia-search-input"></div><hr/><div id="algolia-search-results"><div id="algolia-hits"></div><div id="algolia-pagination"></div><div id="algolia-info"><div class="algolia-stats"></div><div class="algolia-poweredBy"></div></div></div></div></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="https://cdn.jsdelivr.net/npm/algoliasearch/dist/algoliasearch-lite.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instantsearch.js/dist/instantsearch.production.min.js"></script><script src="/js/search/algolia.js"></script><div class="js-pjax"><script>(()=>{
+  const init = () => {
+    twikoo.init(Object.assign({
+      el: '#twikoo-wrap',
+      envId: 'blog-1grnw2l3f5e9a363',
+      region: '',
+      onCommentLoaded: function () {
+        btf.loadLightbox(document.querySelectorAll('#twikoo .tk-content img:not(.tk-owo-emotion)'))
+      }
+    }, null))
+  }
+
+  const getCount = () => {
+    const countELement = document.getElementById('twikoo-count')
+    if(!countELement) return
+    twikoo.getCommentsCount({
+      envId: 'blog-1grnw2l3f5e9a363',
+      region: '',
+      urls: [window.location.pathname],
+      includeReply: false
+    }).then(function (res) {
+      countELement.innerText = res[0].count
+    }).catch(function (err) {
+      console.error(err);
+    });
+  }
+
+  const runFn = () => {
+    init()
+    
+  }
+
+  const loadTwikoo = () => {
+    if (typeof twikoo === 'object') {
+      setTimeout(runFn,0)
+      return
+    } 
+    getScript('https://cdn.jsdelivr.net/npm/twikoo/dist/twikoo.all.min.js').then(runFn)
+  }
+
+  if ('Twikoo' === 'Twikoo' || !false) {
+    if (false) btf.loadComment(document.getElementById('twikoo-wrap'), loadTwikoo)
+    else loadTwikoo()
+  } else {
+    window.loadOtherComment = () => {
+      loadTwikoo()
+    }
+  }
+})()</script></div><div class="aplayer no-destroy" data-id="7826602140" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-volume="0.1"> </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/aplayer/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/metingjs/dist/Meting.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax/pjax.min.js"></script><script>let pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+var pjax = new Pjax({
+  elements: 'a:not([target="_blank"])',
+  selectors: pjaxSelectors,
+  cacheBust: false,
+  analytics: false,
+  scrollRestoration: false
+})
+
+document.addEventListener('pjax:send', function () {
+
+  // removeEventListener scroll 
+  window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+  window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+  document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+  
+  if (window.aplayers) {
+    for (let i = 0; i < window.aplayers.length; i++) {
+      if (!window.aplayers[i].options.fixed) {
+        window.aplayers[i].destroy()
+      }
+    }
+  }
+
+  typeof typed === 'object' && typed.destroy()
+
+  //reset readmode
+  const $bodyClassList = document.body.classList
+  $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+  typeof disqusjs === 'object' && disqusjs.destroy()
+})
+
+document.addEventListener('pjax:complete', function () {
+  window.refreshFn()
+
+  document.querySelectorAll('script[data-pjax]').forEach(item => {
+    const newScript = document.createElement('script')
+    const content = item.text || item.textContent || item.innerHTML || ""
+    Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+    newScript.appendChild(document.createTextNode(content))
+    item.parentNode.replaceChild(newScript, item)
+  })
+
+  GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+  typeof chatBtnFn === 'function' && chatBtnFn()
+  typeof panguInit === 'function' && panguInit()
+
+  // google analytics
+  typeof gtag === 'function' && gtag('config', '', {'page_path': window.location.pathname});
+
+  // baidu analytics
+  typeof _hmt === 'object' && _hmt.push(['_trackPageview',window.location.pathname]);
+
+  typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+  // prismjs
+  typeof Prism === 'object' && Prism.highlightAll()
+})
+
+document.addEventListener('pjax:error', (e) => {
+  if (e.request.status === 404) {
+    pjax.loadUrl('/404.html')
+  }
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
