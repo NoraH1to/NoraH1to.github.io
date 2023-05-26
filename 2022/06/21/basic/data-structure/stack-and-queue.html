@@ -1,9 +1,22 @@
 <hr>
-<h2 id="title-栈和队列date-2022-06-24-14-50-00authors-NoraH1tocategories-数据结构-tags-栈-队列-数据结构"><a href="#title-栈和队列date-2022-06-24-14-50-00authors-NoraH1tocategories-数据结构-tags-栈-队列-数据结构" class="headerlink" title="title: 栈和队列date: 2022-06-24 14:50:00authors: NoraH1tocategories:  - [数据结构]tags:  - 栈  - 队列  - 数据结构"></a>title: 栈和队列<br>date: 2022-06-24 14:50:00<br>authors: NoraH1to<br>categories:<br>  - [数据结构]<br>tags:<br>  - 栈<br>  - 队列<br>  - 数据结构</h2><p>栈和队列属于<strong>线性结构</strong>，他们之间值的取出操作有区别</p>
-<h2 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h2><p>先进后出</p>
-<p><img src="/2022/06/24/basic/data-structure/stack-and-queue/stack.png" alt="栈"></p>
+<p>title: 栈和队列<br>
+date: 2022-06-24 14:50:00<br>
+authors: NoraH1to<br>
+categories:</p>
+<ul>
+<li>[数据结构]<br>
+tags:</li>
+<li>栈</li>
+<li>队列</li>
+<li>数据结构</li>
+</ul>
+<hr>
+<p>栈和队列属于<strong>线性结构</strong>，他们之间值的取出操作有区别</p>
+<h2 id="栈">栈</h2>
+<p>先进后出</p>
+<p><img src="stack.png" alt="栈"></p>
 <p>用数组来模拟：</p>
-<pre><code class="javascript">function stack(arr = []) {
+<pre><code class="language-javascript">function stack(arr = []) {
   this.value = arr.slice();
 }
 stack.prototype = {
@@ -19,10 +32,11 @@ const s = new stack([1, 2, 3]);
 s.add(4); // [1, 2, 3, 4]
 s.pop(); // 4 -&gt; [1, 2, 3]
 </code></pre>
-<h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><p>先进先出</p>
-<p><img src="/2022/06/24/basic/data-structure/stack-and-queue/queue.png" alt="队列"></p>
+<h2 id="队列">队列</h2>
+<p>先进先出</p>
+<p><img src="queue.png" alt="队列"></p>
 <p>用数组来模拟：</p>
-<pre><code class="javascript">function queues(arr = []) {
+<pre><code class="language-javascript">function queues(arr = []) {
   this.value = arr.slice();
 }
 queues.prototype = {

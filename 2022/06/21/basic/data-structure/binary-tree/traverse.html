@@ -1,11 +1,24 @@
 <hr>
-<h2 id="title-二叉树遍历date-2022-06-21-15-34-00authors-NoraH1tocategories-数据结构-tags-二叉树-数据结构"><a href="#title-二叉树遍历date-2022-06-21-15-34-00authors-NoraH1tocategories-数据结构-tags-二叉树-数据结构" class="headerlink" title="title: 二叉树遍历date: 2022-06-21 15:34:00authors: NoraH1tocategories:  - [数据结构]tags:  - 二叉树  - 数据结构"></a>title: 二叉树遍历<br>date: 2022-06-21 15:34:00<br>authors: NoraH1to<br>categories:<br>  - [数据结构]<br>tags:<br>  - 二叉树<br>  - 数据结构</h2><h2 id="前序遍历"><a href="#前序遍历" class="headerlink" title="前序遍历"></a>前序遍历</h2><blockquote>
+<p>title: 二叉树遍历<br>
+date: 2022-06-21 15:34:00<br>
+authors: NoraH1to<br>
+categories:</p>
+<ul>
+<li>[数据结构]<br>
+tags:</li>
+<li>二叉树</li>
+<li>数据结构</li>
+</ul>
+<hr>
+<h2 id="前序遍历">前序遍历</h2>
+<blockquote>
 <p>遍历顺序：<strong>根左右</strong>（<code>DFS 深度优先遍历</code>）</p>
 </blockquote>
 <p>先访问根节点，然后遍历左子树，最后遍历右子树</p>
-<p><img src="/2022/06/21/basic/data-structure/binary-tree/traverse/tree_1.png" alt="二叉树"></p>
+<p><img src="tree_1.png" alt="二叉树"></p>
 <p>结果：<code>ABDECF</code></p>
-<h3 id="递归实现"><a href="#递归实现" class="headerlink" title="递归实现"></a>递归实现</h3><pre><code class="javascript">var preorderTraversal = function (root, array = []) {
+<h3 id="递归实现">递归实现</h3>
+<pre><code class="language-javascript">var preorderTraversal = function (root, array = []) {
   if (root) {
     array.push(root.val);
     preorderTraversal(root.left, array);
@@ -14,16 +27,20 @@
   return array;
 };
 </code></pre>
-<h3 id="非递归实现"><a href="#非递归实现" class="headerlink" title="非递归实现"></a>非递归实现</h3><p>从根节点开始遍历：</p>
+<h3 id="非递归实现">非递归实现</h3>
+<p>从根节点开始遍历：</p>
 <ol>
-<li><p>访问节点值</p>
+<li>
+<p>访问节点值</p>
 </li>
-<li><p>左孩子入栈，直到节点左孩子为空</p>
+<li>
+<p>左孩子入栈，直到节点左孩子为空</p>
 </li>
-<li><p>节点出栈，以节点的右孩子为目标重复 <code>1</code>,<code>2</code>,<code>3</code></p>
+<li>
+<p>节点出栈，以节点的右孩子为目标重复 <code>1</code>,<code>2</code>,<code>3</code></p>
 </li>
 </ol>
-<pre><code class="javascript">var preorderTraversal = function (root) {
+<pre><code class="language-javascript">var preorderTraversal = function (root) {
   const result = [];
   const stack = [];
   let current = root;
@@ -42,13 +59,15 @@
   return result;
 };
 </code></pre>
-<h2 id="中序遍历"><a href="#中序遍历" class="headerlink" title="中序遍历"></a>中序遍历</h2><blockquote>
+<h2 id="中序遍历">中序遍历</h2>
+<blockquote>
 <p>遍历顺序：<strong>左根右</strong></p>
 </blockquote>
 <p>先遍历左子树，然后访问根节点，最后遍历右子树</p>
-<p><img src="/2022/06/21/basic/data-structure/binary-tree/traverse/tree_1.png" alt="二叉树"></p>
+<p><img src="tree_1.png" alt="二叉树"></p>
 <p>结果：<code>DBEAFC</code></p>
-<h3 id="递归实现-1"><a href="#递归实现-1" class="headerlink" title="递归实现"></a>递归实现</h3><pre><code class="javascript">var inorderTraversal = function (root, array = []) {
+<h3 id="递归实现-2">递归实现</h3>
+<pre><code class="language-javascript">var inorderTraversal = function (root, array = []) {
   if (root) {
     inorderTraversal(root.left, array);
     array.push(root.val);
@@ -57,16 +76,20 @@
   return array;
 };
 </code></pre>
-<h3 id="非递归实现-1"><a href="#非递归实现-1" class="headerlink" title="非递归实现"></a>非递归实现</h3><p>从根节点开始遍历：</p>
+<h3 id="非递归实现-2">非递归实现</h3>
+<p>从根节点开始遍历：</p>
 <ol>
-<li><p>左孩子入栈，直到节点左孩子为空</p>
+<li>
+<p>左孩子入栈，直到节点左孩子为空</p>
 </li>
-<li><p>出栈并访问节点值</p>
+<li>
+<p>出栈并访问节点值</p>
 </li>
-<li><p>以节点的右孩子为目标重复 <code>1</code>,<code>2</code>,<code>3</code></p>
+<li>
+<p>以节点的右孩子为目标重复 <code>1</code>,<code>2</code>,<code>3</code></p>
 </li>
 </ol>
-<pre><code class="javascript">var inorderTraversal = function (root) {
+<pre><code class="language-javascript">var inorderTraversal = function (root) {
   const result = [];
   const stack = [];
   let current = root;
@@ -86,13 +109,15 @@
   return result;
 };
 </code></pre>
-<h2 id="后序遍历"><a href="#后序遍历" class="headerlink" title="后序遍历"></a>后序遍历</h2><blockquote>
+<h2 id="后序遍历">后序遍历</h2>
+<blockquote>
 <p>遍历顺序：<strong>左右根</strong></p>
 </blockquote>
 <p>先遍历左子树，然后遍历右子树，最后访问根节点</p>
-<p><img src="/2022/06/21/basic/data-structure/binary-tree/traverse/tree_1.png" alt="二叉树"></p>
+<p><img src="tree_1.png" alt="二叉树"></p>
 <p>结果：<code>DEBFCA</code></p>
-<h3 id="递归实现-2"><a href="#递归实现-2" class="headerlink" title="递归实现"></a>递归实现</h3><pre><code class="javascript">var postorderTraversal = function (root, array = []) {
+<h3 id="递归实现-3">递归实现</h3>
+<pre><code class="language-javascript">var postorderTraversal = function (root, array = []) {
   if (root) {
     postorderTraversal(root.left, array);
     postorderTraversal(root.right, array);
@@ -101,16 +126,20 @@
   return array;
 };
 </code></pre>
-<h3 id="非递归实现-2"><a href="#非递归实现-2" class="headerlink" title="非递归实现"></a>非递归实现</h3><p>从根节点开始遍历：</p>
+<h3 id="非递归实现-3">非递归实现</h3>
+<p>从根节点开始遍历：</p>
 <ol>
-<li><p>左孩子入栈，直到节点左孩子为空</p>
+<li>
+<p>左孩子入栈，直到节点左孩子为空</p>
 </li>
-<li><p>检查栈顶的节点，如果右节点为空或者右节点被访问过，节点出栈并访问，并标记节点为已访问</p>
+<li>
+<p>检查栈顶的节点，如果右节点为空或者右节点被访问过，节点出栈并访问，并标记节点为已访问</p>
 </li>
-<li><p>如果栈顶的右节点不为空且未访问，以节点的右孩子为目标重复 <code>1</code>,<code>2</code>,<code>3</code></p>
+<li>
+<p>如果栈顶的右节点不为空且未访问，以节点的右孩子为目标重复 <code>1</code>,<code>2</code>,<code>3</code></p>
 </li>
 </ol>
-<pre><code class="javascript">var postorderTraversal = function (root) {
+<pre><code class="language-javascript">var postorderTraversal = function (root) {
   const result = [];
   const stack = [];
   let last = null; // 标记上一个访问的节点

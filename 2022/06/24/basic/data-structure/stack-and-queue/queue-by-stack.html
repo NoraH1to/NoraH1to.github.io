@@ -1,16 +1,32 @@
 <hr>
-<h2 id="title-使用栈实现队列date-2022-06-24-16-57-00authors-NoraH1tocategories-数据结构-tags-数据结构-栈-队列"><a href="#title-使用栈实现队列date-2022-06-24-16-57-00authors-NoraH1tocategories-数据结构-tags-数据结构-栈-队列" class="headerlink" title="title: 使用栈实现队列date: 2022-06-24 16:57:00authors: NoraH1tocategories:  - [数据结构]tags:  - 数据结构  - 栈  - 队列"></a>title: 使用栈实现队列<br>date: 2022-06-24 16:57:00<br>authors: NoraH1to<br>categories:<br>  - [数据结构]<br>tags:<br>  - 数据结构<br>  - 栈<br>  - 队列</h2><h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>队列和栈的区别就是<strong>弹出顺序</strong>，我们只需要把<strong>反转出栈顺序</strong>即可</p>
+<p>title: 使用栈实现队列<br>
+date: 2022-06-24 16:57:00<br>
+authors: NoraH1to<br>
+categories:</p>
+<ul>
+<li>[数据结构]<br>
+tags:</li>
+<li>数据结构</li>
+<li>栈</li>
+<li>队列</li>
+</ul>
+<hr>
+<h2 id="思路">思路</h2>
+<p>队列和栈的区别就是<strong>弹出顺序</strong>，我们只需要把<strong>反转出栈顺序</strong>即可</p>
 <p>那么需要维护两个栈，一个栈用来入列，一个栈来反转元素顺序并出列：</p>
 <ul>
-<li><p><strong>入列栈</strong>（栈1）</p>
+<li>
+<p><strong>入列栈</strong>（栈1）</p>
 <p>推入队列的数据都丢到这</p>
 </li>
-<li><p><strong>出列栈</strong>（栈2）</p>
+<li>
+<p><strong>出列栈</strong>（栈2）</p>
 <p>弹出时从这个栈弹出，如果没有数据，则把入列栈的所有数据弹出并压入，然后再弹出以反转顺序</p>
 </li>
 </ul>
-<p><img src="/2022/06/24/basic/data-structure/stack-and-queue/queue-by-stack/queue_by_stack.png" alt="双栈实现队列"></p>
-<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><pre><code class="javascript">function queue() {
+<p><img src="queue_by_stack.png" alt="双栈实现队列"></p>
+<h2 id="实现">实现</h2>
+<pre><code class="language-javascript">function queue() {
   this.pushStack = [];
   this.popStack = [];
 }
