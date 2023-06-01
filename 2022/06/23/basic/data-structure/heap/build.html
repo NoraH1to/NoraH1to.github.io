@@ -1,29 +1,14 @@
 <hr>
-<p>title: 构建堆<br>
-date: 2022-06-23 16:20:00<br>
-authors: NoraH1to<br>
-categories:</p>
-<ul>
-<li>[数据结构]<br>
-tags:</li>
-<li>堆</li>
-<li>数据结构</li>
-</ul>
-<hr>
-<h2 id="最大堆">最大堆</h2>
-<p>从最后一个非叶子节点开始：</p>
+<h2 id="title-构建堆date-2022-06-23-16-20-00authors-NoraH1tocategories-数据结构-tags-堆-数据结构"><a href="#title-构建堆date-2022-06-23-16-20-00authors-NoraH1tocategories-数据结构-tags-堆-数据结构" class="headerlink" title="title: 构建堆date: 2022-06-23 16:20:00authors: NoraH1tocategories:  - [数据结构]tags:  - 堆  - 数据结构"></a>title: 构建堆<br>date: 2022-06-23 16:20:00<br>authors: NoraH1to<br>categories:<br>  - [数据结构]<br>tags:<br>  - 堆<br>  - 数据结构</h2><h2 id="最大堆"><a href="#最大堆" class="headerlink" title="最大堆"></a>最大堆</h2><p>从最后一个非叶子节点开始：</p>
 <ol>
-<li>
-<p>和孩子节点的最大值比较</p>
+<li><p>和孩子节点的最大值比较</p>
 </li>
-<li>
-<p>大于 - 不需要继续下沉</p>
+<li><p>大于 - 不需要继续下沉</p>
 </li>
-<li>
-<p>小于 - 和最大值交换位置，继续和下一层孩子重复 <code>1</code>,<code>2</code>,<code>3</code></p>
+<li><p>小于 - 和最大值交换位置，继续和下一层孩子重复 <code>1</code>,<code>2</code>,<code>3</code></p>
 </li>
 </ol>
-<pre><code class="language-javascript">function adjustMaxHeap(array, index, length) {
+<pre><code class="javascript">function adjustMaxHeap(array, index, length) {
   // 每次循环都从从当前节点的左孩子开始
   for (let i = 2 * index + 1; i &lt; length; i = 2 * i + 1) {
     // 如果右孩子存在且大于左孩子，指针指向右孩子
@@ -49,20 +34,16 @@ function createMaxHeap(arr, length) {
   return arr;
 }
 </code></pre>
-<h2 id="最小堆">最小堆</h2>
-<p>从最后一个非叶子节点开始：</p>
+<h2 id="最小堆"><a href="#最小堆" class="headerlink" title="最小堆"></a>最小堆</h2><p>从最后一个非叶子节点开始：</p>
 <ol>
-<li>
-<p>和孩子节点的最小值比较</p>
+<li><p>和孩子节点的最小值比较</p>
 </li>
-<li>
-<p>小于 - 不需要继续下沉</p>
+<li><p>小于 - 不需要继续下沉</p>
 </li>
-<li>
-<p>大于 - 和最小值交换位置，继续和下一层孩子重复 <code>1</code>,<code>2</code>,<code>3</code></p>
+<li><p>大于 - 和最小值交换位置，继续和下一层孩子重复 <code>1</code>,<code>2</code>,<code>3</code></p>
 </li>
 </ol>
-<pre><code class="language-javascript">function adjustMinHeap(array, index, length) {
+<pre><code class="javascript">function adjustMinHeap(array, index, length) {
   // 每次循环都从从当前节点的左孩子开始
   for (let i = 2 * index + 1; i &lt; length; i = 2 * i + 1) {
     // 如果右孩子存在且小于左孩子，指针指向右孩子

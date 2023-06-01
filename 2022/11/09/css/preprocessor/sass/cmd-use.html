@@ -1,49 +1,33 @@
 <hr>
-<p>title: ‘@use’<br>
-date: 2022-11-09 18:13:00<br>
-authors: NoraH1to<br>
-categories:</p>
+<h2 id="title-‘-use’date-2022-11-09-18-13-00authors-NoraH1tocategories-前端-css-预处理器-sass-tags-sass"><a href="#title-‘-use’date-2022-11-09-18-13-00authors-NoraH1tocategories-前端-css-预处理器-sass-tags-sass" class="headerlink" title="title: ‘@use’date: 2022-11-09 18:13:00authors: NoraH1tocategories:  - [前端, css, 预处理器, sass]tags:  - sass"></a>title: ‘@use’<br>date: 2022-11-09 18:13:00<br>authors: NoraH1to<br>categories:<br>  - [前端, css, 预处理器, sass]<br>tags:<br>  - sass</h2><p>解决 <code>@import</code> 痛点的替代品</p>
+<h2 id="与-import-的主要区别"><a href="#与-import-的主要区别" class="headerlink" title="与 @import 的主要区别"></a>与 <code>@import</code> 的主要区别</h2><p>虽然 <code>@use</code> 是用来替代 <code>@import</code> 的，但它被设计成了不同的工作方式，这是有意的。以下是两者之间主要的不同点：</p>
 <ul>
-<li>[前端, css, 预处理器, sass]<br>
-tags:</li>
-<li>sass</li>
-</ul>
-<hr>
-<p>解决 <code>@import</code> 痛点的替代品</p>
-<h2 id="与-import-的主要区别">与 <code>@import</code> 的主要区别</h2>
-<p>虽然 <code>@use</code> 是用来替代 <code>@import</code> 的，但它被设计成了不同的工作方式，这是有意的。以下是两者之间主要的不同点：</p>
-<ul>
-<li>
-<p><code>@use</code> 仅使<strong>变量、函数</strong>和<strong>混入</strong>可以在当前文件范围使用。它不会将这些东西放到全局作用域。这意味着你可以更容易判断这些东西引用自哪里，并且也意味着你能够用更短的变量名而不用担心名称冲突。</p>
+<li><p><code>@use</code> 仅使<strong>变量、函数</strong>和<strong>混入</strong>可以在当前文件范围使用。它不会将这些东西放到全局作用域。这意味着你可以更容易判断这些东西引用自哪里，并且也意味着你能够用更短的变量名而不用担心名称冲突。</p>
 </li>
-<li>
-<p><code>@use</code> 对每一个文件都只加载一次。这可以确保不会生成多余的 CSS 代码。</p>
+<li><p><code>@use</code> 对每一个文件都只加载一次。这可以确保不会生成多余的 CSS 代码。</p>
 </li>
-<li>
-<p><code>@use</code> 只能出现在文件开头。并且不能写在嵌套的样式规则中。</p>
+<li><p><code>@use</code> 只能出现在文件开头。并且不能写在嵌套的样式规则中。</p>
 </li>
-<li>
-<p>对于每个 <code>@use</code> 命令，都只能拥有一个引入的 URL。<code>@import</code> 可以引入多个。</p>
+<li><p>对于每个 <code>@use</code> 命令，都只能拥有一个引入的 URL。<code>@import</code> 可以引入多个。</p>
 </li>
-<li>
-<p><code>@use</code> 不论是使用 <code>sass</code> 还是 <code>scss</code> 语法，其 URL 都必须添加引号。</p>
+<li><p><code>@use</code> 不论是使用 <code>sass</code> 还是 <code>scss</code> 语法，其 URL 都必须添加引号。</p>
 </li>
 </ul>
-<h2 id="基本使用">基本使用</h2>
-<p>可以使用 <code>@use</code> 从其它 <code>Sass</code> 样式表中加载<strong>混入(mixin)</strong>、<strong>函数(function)<strong>和</strong>变量</strong>，并且将多个样式表的 <code>css</code> 组合到一起。被 <code>@use</code> 加载的样式表被称作**“模块(modules)”**。同时 <code>Sass</code> 内部也提供了一系列有用的模块。</p>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><p>可以使用 <code>@use</code> 从其它 <code>Sass</code> 样式表中加载<strong>混入(mixin)<strong>、</strong>函数(function)<strong>和</strong>变量</strong>，并且将多个样式表的 <code>css</code> 组合到一起。被 <code>@use</code> 加载的样式表被称作<strong>“模块(modules)”</strong>。同时 <code>Sass</code> 内部也提供了一系列有用的模块。</p>
 <p>最基础的使用方法是 <code>@use &quot;&lt;url&gt;&quot;</code>，通过 URL 来加载模块。任何通过这种方式加载的样式<strong>不论被加载多少次</strong>，在编译后输出的 CSS 中只会出现<strong>一次</strong>，避免了 <code>@import</code> 中多次出现的冗余问题。</p>
 <p>{% note warning modern %}</p>
 <p><code>@use</code> 必须放在除了 <code>@forward</code> 以外规则的上方，包括样式规则。但是在<a href="#%E9%85%8D%E7%BD%AE%E6%A8%A1%E5%9D%97"><strong>配置模块</strong></a>时可以在 <code>@use</code> 前定义变量。</p>
 <p>{% endnote %}</p>
 <p>{% tabs %}</p>
 <!-- tab scss -->
-<pre><code class="language-scss">// foundation/_code.scss
+
+<pre><code class="scss">// foundation/_code.scss
 .code {
   padding: 0.25em;
   line-height: 0;
 }
 </code></pre>
-<pre><code class="language-scss">// foundation/_lists.scss
+<pre><code class="scss">// foundation/_lists.scss
 ul,
 ol {
   text-align: left;
@@ -55,13 +39,14 @@ ol {
   }
 }
 </code></pre>
-<pre><code class="language-scss">// style.scss
-@use 'foundation/code';
-@use 'foundation/lists';
+<pre><code class="scss">// style.scss
+@use &#39;foundation/code&#39;;
+@use &#39;foundation/lists&#39;;
 </code></pre>
 <!-- endtab -->
 <!-- tab css -->
-<pre><code class="language-css">code {
+
+<pre><code class="css">code {
   padding: 0.25em;
   line-height: 0;
 }
@@ -78,23 +63,23 @@ ol ol {
 </code></pre>
 <!-- endtab -->
 <p>{% endtabs %}</p>
-<h2 id="加载成员">加载成员</h2>
-<p>你可以通过 <code>&lt;namespace&gt;.&lt;name&gt;</code> 的形式来使用<strong>混入(mixin)</strong>、<strong>函数(function)<strong>和</strong>变量</strong>。在默认情况下，模块链接名就是 <code>namespace</code> 命名空间。</p>
+<h2 id="加载成员"><a href="#加载成员" class="headerlink" title="加载成员"></a>加载成员</h2><p>你可以通过 <code>&lt;namespace&gt;.&lt;name&gt;</code> 的形式来使用<strong>混入(mixin)<strong>、</strong>函数(function)<strong>和</strong>变量</strong>。在默认情况下，模块链接名就是 <code>namespace</code> 命名空间。</p>
 <p>被加载的成员(变量、函数、混入)只能在加载它们的地方使用。其它样式表需要编写其自身的 <code>@use</code> 规则来使用他们。这有助于判断引用的成员来自哪里。如果你想一次性从多个文件中加载成员，你可以使用 <code>@forward</code> 将需要的成员全部转发到一个文件中。</p>
 <p>{% note default modern %}</p>
 <p>因为使用了命名空间，我们可以安心的使用简单的变量命名例如 <code>$width</code>, <code>$height</code>。这与使用 <code>@import</code> 不同，它避免了使用像 <code>$foo-bar-width</code> 这样繁琐的命名来防止名称冲突。且能让你的代码更加简洁易懂。</p>
 <p>{% endnote %}</p>
 <p>{% tabs %}</p>
 <!-- tab scss -->
-<pre><code class="language-scss">// src/_corners.scss
+
+<pre><code class="scss">// src/_corners.scss
 $radius: 3px;
 
 @mixin rounded {
   border-radius: $radius;
 }
 </code></pre>
-<pre><code class="language-scss">// style.scss
-@use 'src/corners';
+<pre><code class="scss">// style.scss
+@use &#39;src/corners&#39;;
 
 .button {
   @include corners.rounded;
@@ -103,26 +88,27 @@ $radius: 3px;
 </code></pre>
 <!-- endtab -->
 <!-- tab css -->
-<pre><code class="language-css">.button {
+
+<pre><code class="css">.button {
   border-radius: 3px;
   padding: 8px;
 }
 </code></pre>
 <!-- endtab -->
 <p>{% endtabs %}</p>
-<h3 id="自定义命名空间">自定义命名空间</h3>
-<p>默认情况下，命名空间是 URL 最后一个部分，且不带扩展名。然而你可能想要选择一个不同的命名空间，比如更短的命名空间，又或者需要加载多个文件名相同的模块。此时你可以通过 <code>@use &quot;&lt;url&gt;&quot; as &lt;namespace&gt;</code> 来自定义命名空间。</p>
+<h3 id="自定义命名空间"><a href="#自定义命名空间" class="headerlink" title="自定义命名空间"></a>自定义命名空间</h3><p>默认情况下，命名空间是 URL 最后一个部分，且不带扩展名。然而你可能想要选择一个不同的命名空间，比如更短的命名空间，又或者需要加载多个文件名相同的模块。此时你可以通过 <code>@use &quot;&lt;url&gt;&quot; as &lt;namespace&gt;</code> 来自定义命名空间。</p>
 <p>{% tabs %}</p>
 <!-- tab scss -->
-<pre><code class="language-scss">// src/_corners.scss
+
+<pre><code class="scss">// src/_corners.scss
 $radius: 3px;
 
 @mixin rounded {
   border-radius: $radius;
 }
 </code></pre>
-<pre><code class="language-scss">// style.scss
-@use 'src/corners' as c;
+<pre><code class="scss">// style.scss
+@use &#39;src/corners&#39; as c;
 
 .button {
   @include c.rounded;
@@ -131,7 +117,8 @@ $radius: 3px;
 </code></pre>
 <!-- endtab -->
 <!-- tab css -->
-<pre><code class="language-css">.button {
+
+<pre><code class="css">.button {
   border-radius: 3px;
   padding: 8px;
 }
@@ -141,15 +128,16 @@ $radius: 3px;
 <p>甚至还可以通过 <code>@use &quot;&lt;url&gt;&quot; as *</code> 来忽略命名空间。不过我们只建议在编写个人使用的样式表时这样做；否则他人使用时可能会发生命名冲突！</p>
 <p>{% tabs %}</p>
 <!-- tab scss -->
-<pre><code class="language-scss">// src/_corners.scss
+
+<pre><code class="scss">// src/_corners.scss
 $radius: 3px;
 
 @mixin rounded {
   border-radius: $radius;
 }
 </code></pre>
-<pre><code class="language-scss">// style.scss
-@use 'src/corners' as *;
+<pre><code class="scss">// style.scss
+@use &#39;src/corners&#39; as *;
 
 .button {
   @include rounded;
@@ -158,27 +146,27 @@ $radius: 3px;
 </code></pre>
 <!-- endtab -->
 <!-- tab css -->
-<pre><code class="language-css">.button {
+
+<pre><code class="css">.button {
   border-radius: 3px;
   padding: 8px;
 }
 </code></pre>
 <!-- endtab -->
 <p>{% endtabs %}</p>
-<h3 id="私有成员">私有成员</h3>
-<p>作为一个样式表作者，你可能希望用户在样式表外部只能访问你让他们访问的成员。<code>Sass</code> 提供了一种简单的方式来定义私有成员，成员名称以 <code>-</code> 或者 <code>_</code> 都视为私有成员。在你的样式表内部可以正常访问这些成员，但这些成员不会存在于向外部公开的模块接口中。这意味着加载你模块的样式表看不见他们。</p>
+<h3 id="私有成员"><a href="#私有成员" class="headerlink" title="私有成员"></a>私有成员</h3><p>作为一个样式表作者，你可能希望用户在样式表外部只能访问你让他们访问的成员。<code>Sass</code> 提供了一种简单的方式来定义私有成员，成员名称以 <code>-</code> 或者 <code>_</code> 都视为私有成员。在你的样式表内部可以正常访问这些成员，但这些成员不会存在于向外部公开的模块接口中。这意味着加载你模块的样式表看不见他们。</p>
 <p>{% note default modern %}</p>
 <p>如果你想让模块<strong>对整个包</strong>而不是单个模块不可见，你只需要避免在你包的任意入口(你告知用户的包入口)转发(<code>forward</code>)模块即可。当然也可以在<strong>转发模块时隐藏部分成员</strong></p>
 <p>{% endnote %}</p>
-<pre><code class="language-scss">// src/_corners.scss
+<pre><code class="scss">// src/_corners.scss
 $-radius: 3px;
 
 @mixin rounded {
   border-radius: $-radius;
 }
 </code></pre>
-<pre><code class="language-scss">// style.scss
-@use 'src/corners';
+<pre><code class="scss">// style.scss
+@use &#39;src/corners&#39;;
 
 .button {
   @include corners.rounded;
@@ -187,11 +175,11 @@ $-radius: 3px;
   padding: 5px + corners.$-radius;
 }
 </code></pre>
-<h2 id="配置模块">配置模块</h2>
-<p>定义变量时，通过 <code>!default</code> 这个 flag 使其变为<strong>可配置</strong>的。使用 <code>@use &lt;url&gt; with ( &lt;variable&gt;: &lt;value&gt;, &lt;variable&gt;: &lt;value&gt; )</code> 在加载模块时应用配置。配置中的值会覆盖模块中对应变量的默认值。</p>
+<h2 id="配置模块"><a href="#配置模块" class="headerlink" title="配置模块"></a>配置模块</h2><p>定义变量时，通过 <code>!default</code> 这个 flag 使其变为<strong>可配置</strong>的。使用 <code>@use &lt;url&gt; with ( &lt;variable&gt;: &lt;value&gt;, &lt;variable&gt;: &lt;value&gt; )</code> 在加载模块时应用配置。配置中的值会覆盖模块中对应变量的默认值。</p>
 <p>{% tabs %}</p>
 <!-- tab scss -->
-<pre><code class="language-scss">// _library.scss
+
+<pre><code class="scss">// _library.scss
 $black: #000 !default;
 $border-radius: 0.25rem !default;
 $box-shadow: 0 0.5rem 1rem rgba($black, 0.15) !default;
@@ -201,26 +189,27 @@ code {
   box-shadow: $box-shadow;
 }
 </code></pre>
-<pre><code class="language-scss">// style.scss
-@use 'library' with (
+<pre><code class="scss">// style.scss
+@use &#39;library&#39; with (
   $black: #222,
   $border-radius: 0.1rem
 );
 </code></pre>
 <!-- endtab -->
 <!-- tab css -->
-<pre><code class="language-css">code {
+
+<pre><code class="css">code {
   border-radius: 0.1rem;
   box-shadow: 0 0.5rem 1rem rgba(34, 34, 34, 0.15);
 }
 </code></pre>
 <!-- endtab -->
 <p>{% endtabs %}</p>
-<h3 id="使用-mixin">使用 mixin</h3>
-<p>使用 <code>@use ... with</code> 配置模块非常方便，尤其是在使用一开始用 <code>@import</code> 编写的库时。但它并不是特别灵活，我们不建议将其用于更高级的用例。如果您发现自己想将 <code>Map</code> 作为配置传递从而一次配置多个变量，或者在<strong>模块加载后更新配置</strong>，请考虑编写一个 <code>mixin</code> 来设置您的变量，然后再编写一个 <code>mixin</code> 来注入您的样式。</p>
+<h3 id="使用-mixin"><a href="#使用-mixin" class="headerlink" title="使用 mixin"></a>使用 mixin</h3><p>使用 <code>@use ... with</code> 配置模块非常方便，尤其是在使用一开始用 <code>@import</code> 编写的库时。但它并不是特别灵活，我们不建议将其用于更高级的用例。如果您发现自己想将 <code>Map</code> 作为配置传递从而一次配置多个变量，或者在<strong>模块加载后更新配置</strong>，请考虑编写一个 <code>mixin</code> 来设置您的变量，然后再编写一个 <code>mixin</code> 来注入您的样式。</p>
 <p>{% tabs %}</p>
 <!-- tab scss -->
-<pre><code class="language-scss">// _library.scss
+
+<pre><code class="scss">// _library.scss
 $-black: #000;
 $-border-radius: 0.25rem;
 $-box-shadow: null;
@@ -252,8 +241,8 @@ $-box-shadow: null;
   }
 }
 </code></pre>
-<pre><code class="language-scss">// style.scss
-@use 'library';
+<pre><code class="scss">// style.scss
+@use &#39;library&#39;;
 
 // 配置已经载入的模块 library
 @include library.configure($black: #222, $border-radius: 0.1rem);
@@ -263,67 +252,64 @@ $-box-shadow: null;
 </code></pre>
 <!-- endtab -->
 <!-- tab css -->
-<pre><code class="language-css">code {
+
+<pre><code class="css">code {
   border-radius: 0.1rem;
   box-shadow: 0 0.5rem 1rem rgba(34, 34, 34, 0.15);
 }
 </code></pre>
 <!-- endtab -->
 <p>{% endtabs %}</p>
-<h3 id="重新定义变量">重新定义变量</h3>
-<p>加载一个模块后，你可以重新定义其变量。</p>
-<pre><code class="language-scss">// _library.scss
+<h3 id="重新定义变量"><a href="#重新定义变量" class="headerlink" title="重新定义变量"></a>重新定义变量</h3><p>加载一个模块后，你可以重新定义其变量。</p>
+<pre><code class="scss">// _library.scss
 $color: red;
 </code></pre>
-<pre><code class="language-scss">// _override.scss
-@use 'library';
+<pre><code class="scss">// _override.scss
+@use &#39;library&#39;;
 library.$color: blue;
 </code></pre>
-<pre><code class="language-scss">// style.scss
-@use 'library';
-@use 'override';
+<pre><code class="scss">// style.scss
+@use &#39;library&#39;;
+@use &#39;override&#39;;
 @debug library.$color; //=&gt; blue
 </code></pre>
 <p>在使用 <code>as *</code> 时这种方法依然有效</p>
-<pre><code class="language-scss">// _library.scss
+<pre><code class="scss">// _library.scss
 $color: red;
 </code></pre>
-<pre><code class="language-scss">// _override.scss
-@use 'library' as *;
+<pre><code class="scss">// _override.scss
+@use &#39;library&#39; as *;
 $color: blue;
 </code></pre>
-<pre><code class="language-scss">// style.scss
-@use 'library';
-@use 'override';
+<pre><code class="scss">// style.scss
+@use &#39;library&#39;;
+@use &#39;override&#39;;
 @debug library.$color; //=&gt; blue
 </code></pre>
 <p>{% note default modern %}</p>
 <p><code>@debug</code> 可以在控制台(不是浏览器的)打印值</p>
 <p>{% endnote %}</p>
-<h2 id="模块加载">模块加载</h2>
-<p>你可以在引入时省略扩展名 <code>@use &quot;variables&quot;</code>，<code>Sass</code> 会自动加载 <code>variables.scss</code>,<code>variables.sass</code> 或 <code>variables.css</code>。</p>
+<h2 id="模块加载"><a href="#模块加载" class="headerlink" title="模块加载"></a>模块加载</h2><p>你可以在引入时省略扩展名 <code>@use &quot;variables&quot;</code>，<code>Sass</code> 会自动加载 <code>variables.scss</code>,<code>variables.sass</code> 或 <code>variables.css</code>。</p>
 <p>{% note warning modern %}</p>
 <p>为了确保跨平台兼容性，所有<strong>路径均使用正斜杠 <code>/</code></strong></p>
 <p>{% endnote %}</p>
-<h3 id="加载路径">加载路径</h3>
-<p>用户可以提供加载路径给 <code>Sass</code> 解析，<code>Sass</code> 在定位模块时将使用加载路径。例如 <code>node_modules/susy/sass</code> 作为一个加载路径，你可以通过 <code>@use &quot;susy&quot;</code> 来加载 <code>node_modules/susy/sass/susy.scss</code>。</p>
+<h3 id="加载路径"><a href="#加载路径" class="headerlink" title="加载路径"></a>加载路径</h3><p>用户可以提供加载路径给 <code>Sass</code> 解析，<code>Sass</code> 在定位模块时将使用加载路径。例如 <code>node_modules/susy/sass</code> 作为一个加载路径，你可以通过 <code>@use &quot;susy&quot;</code> 来加载 <code>node_modules/susy/sass/susy.scss</code>。</p>
 <p><code>Sass</code> 会优先加载当前文件目录下的模块，如果不存在才会使用加载路径。这可以确保在添加新库时不会出现错误的引入。</p>
 <p>{% note default modern %}</p>
 <p><code>Sass</code> 的路径总是相对的，<code>./</code> 并不是必须的</p>
 <p>{% endnote %}</p>
-<h3 id="块">块</h3>
-<p>作为一个约定，以 <code>_</code> 开头的 <code>Sass</code> 文件被认作为一个模块。这种文件被称为“<strong>块</strong>”，<code>Sass</code> 会避免单独编译这些文件。在引入块时可以忽略 <code>_</code>。同时</p>
-<h3 id="主文件">主文件</h3>
-<p>如果在某个文件夹中有一个 <code>_index.scss</code> 或 <code>_index.sass</code> 文件，在以该文件夹为路径加载时，该主文件会被自动载入。</p>
+<h3 id="块"><a href="#块" class="headerlink" title="块"></a>块</h3><p>作为一个约定，以 <code>_</code> 开头的 <code>Sass</code> 文件被认作为一个模块。这种文件被称为“<strong>块</strong>”，<code>Sass</code> 会避免单独编译这些文件。在引入块时可以忽略 <code>_</code>。同时</p>
+<h3 id="主文件"><a href="#主文件" class="headerlink" title="主文件"></a>主文件</h3><p>如果在某个文件夹中有一个 <code>_index.scss</code> 或 <code>_index.sass</code> 文件，在以该文件夹为路径加载时，该主文件会被自动载入。</p>
 <p>{% tabs %}</p>
 <!-- tab scss -->
-<pre><code class="language-scss">// foundation/_code.scss
+
+<pre><code class="scss">// foundation/_code.scss
 code {
   padding: 0.25em;
   line-height: 0;
 }
 </code></pre>
-<pre><code class="language-scss">// foundation/_lists.scss
+<pre><code class="scss">// foundation/_lists.scss
 ul,
 ol {
   text-align: left;
@@ -336,17 +322,18 @@ ol {
   }
 }
 </code></pre>
-<pre><code class="language-scss">// foundation/_index.scss
-@use 'code';
-@use 'lists';
+<pre><code class="scss">// foundation/_index.scss
+@use &#39;code&#39;;
+@use &#39;lists&#39;;
 </code></pre>
-<pre><code class="language-scss">// style.scss
+<pre><code class="scss">// style.scss
 // 自动引入了 foundation/_index.scss
-@use 'foundation';
+@use &#39;foundation&#39;;
 </code></pre>
 <!-- endtab -->
 <!-- tab css -->
-<pre><code class="language-css">code {
+
+<pre><code class="css">code {
   padding: 0.25em;
   line-height: 0;
 }
